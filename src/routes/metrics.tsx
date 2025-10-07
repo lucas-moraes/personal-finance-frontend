@@ -4,5 +4,5 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/metrics")({ component: Metrics });
 
 function Metrics() {
-  return MetricsPage();
+  return <MetricsPage />;
 }
