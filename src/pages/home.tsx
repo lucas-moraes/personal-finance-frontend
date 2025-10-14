@@ -229,7 +229,7 @@ export const HomePage = () => {
               + Categories
             </Button>
             <Button variant="outline" className="text-white">
-              + Add Groupt
+              + Add Group
             </Button>
             <Button variant="outline" className="text-white">
               + Invoice

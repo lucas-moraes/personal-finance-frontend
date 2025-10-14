@@ -15,7 +15,7 @@ export const Navbar = () => {
         <Link to="/"></Link>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link to="/home" className="flex flex-col items-center text-violet-500 ">
+            <Link to="/app/home" className="flex flex-col items-center text-violet-500 ">
               <House size={40} />
             </Link>
           </TooltipTrigger>
@@ -25,7 +25,7 @@ export const Navbar = () => {
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link to="/metrics" className="flex flex-col items-center text-violet-500">
+            <Link to="/app/metrics" className="flex flex-col items-center text-violet-500">
               <AlignEndHorizontal size={40} />
             </Link>
           </TooltipTrigger>

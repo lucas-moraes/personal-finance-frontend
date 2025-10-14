@@ -9,18 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as MetricsRouteImport } from './routes/metrics'
-import { Route as HomeRouteImport } from './routes/home'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppMetricsRouteImport } from './routes/app.metrics'
+import { Route as AppHomeRouteImport } from './routes/app.home'
 
-const MetricsRoute = MetricsRouteImport.update({
-  id: '/metrics',
-  path: '/metrics',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HomeRoute = HomeRouteImport.update({
-  id: '/home',
-  path: '/home',
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -28,51 +30,67 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppMetricsRoute = AppMetricsRouteImport.update({
+  id: '/metrics',
+  path: '/metrics',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHomeRoute = AppHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/home': typeof HomeRoute
-  '/metrics': typeof MetricsRoute
+  '/app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/app/home': typeof AppHomeRoute
+  '/app/metrics': typeof AppMetricsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/home': typeof HomeRoute
-  '/metrics': typeof MetricsRoute
+  '/app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/app/home': typeof AppHomeRoute
+  '/app/metrics': typeof AppMetricsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/home': typeof HomeRoute
-  '/metrics': typeof MetricsRoute
+  '/app': typeof AppRouteWithChildren
+  '/login': typeof LoginRoute
+  '/app/home': typeof AppHomeRoute
+  '/app/metrics': typeof AppMetricsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/home' | '/metrics'
+  fullPaths: '/' | '/app' | '/login' | '/app/home' | '/app/metrics'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/metrics'
-  id: '__root__' | '/' | '/home' | '/metrics'
+  to: '/' | '/app' | '/login' | '/app/home' | '/app/metrics'
+  id: '__root__' | '/' | '/app' | '/login' | '/app/home' | '/app/metrics'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  HomeRoute: typeof HomeRoute
-  MetricsRoute: typeof MetricsRoute
+  AppRoute: typeof AppRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/metrics': {
-      id: '/metrics'
-      path: '/metrics'
-      fullPath: '/metrics'
-      preLoaderRoute: typeof MetricsRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/home': {
-      id: '/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof HomeRouteImport
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -82,13 +100,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/metrics': {
+      id: '/app/metrics'
+      path: '/metrics'
+      fullPath: '/app/metrics'
+      preLoaderRoute: typeof AppMetricsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/home': {
+      id: '/app/home'
+      path: '/home'
+      fullPath: '/app/home'
+      preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppHomeRoute: typeof AppHomeRoute
+  AppMetricsRoute: typeof AppMetricsRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppHomeRoute: AppHomeRoute,
+  AppMetricsRoute: AppMetricsRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  HomeRoute: HomeRoute,
-  MetricsRoute: MetricsRoute,
+  AppRoute: AppRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
