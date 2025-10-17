@@ -1,3 +1,5 @@
+'use client';
+
 import React from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -182,7 +184,7 @@ export const HomePage = () => {
 
   return (
     <GlassCard shadowMode={true} cornerRadius={16} blurAmount={0.01}>
-      <Card className="w-[700px] pt-10 pb-10 bg-transparent text-white shadow-none border border-purple-400/10">
+      <Card className="w-[700px] p-5 bg-transparent text-white shadow-none border border-purple-400/10">
         <CardContent>
           <div className="flex w-full flex-col gap-6">
             <Tabs defaultValue="invoices">

@@ -1,22 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { Datepicker } from "@/components/ui/datepicker";
 import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
-import { X } from "lucide-react";
+import { Save, X } from "lucide-react";
 import { InputSelect } from "../input-select";
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@/components/ui/input-group";
 import { Input } from "@/components/ui/input";
 import type React from "react";
 
-export const CardEditInvoice: React.FC<{ title: string, onClose: () => void }> = ({title, onClose }) => {
+export const CardEditInvoice: React.FC<{ title: string; onClose: () => void }> = ({ title, onClose }) => {
   return (
     <FieldSet>
       <FieldLegend className="flex flex-row items-center w-full pb-4 border-b border-white/20 justify-between">
         {title}
-        <Button
-          variant="ghost"
-          className="p-0 m-0 cursor-pointer text-white hover:text-red-500"
-          onClick={onClose}
-        >
+        <Button variant="ghost" className="p-0 m-0 cursor-pointer text-white hover:text-red-500" onClick={onClose}>
           <X size={16} />
         </Button>
       </FieldLegend>
@@ -48,7 +44,7 @@ export const CardEditInvoice: React.FC<{ title: string, onClose: () => void }> =
             />
           </Field>
         </div>
-        <div className="grid grid-cols-[1fr_3fr] gap-4">
+        <div className="grid grid-cols-[2fr_5fr_1fr] gap-4">
           <Field>
             <FieldLabel htmlFor="value">Amount</FieldLabel>
             <InputGroup>
@@ -61,6 +57,11 @@ export const CardEditInvoice: React.FC<{ title: string, onClose: () => void }> =
           <Field>
             <FieldLabel htmlFor="username">Description</FieldLabel>
             <Input id="username" autoComplete="off" />
+          </Field>
+          <Field className="flex flex-col justify-end">
+            <Button className="p-0 m-0 text-white cursor-pointer self-end" variant="outline">
+             <Save />
+            </Button>
           </Field>
         </div>
       </FieldGroup>
