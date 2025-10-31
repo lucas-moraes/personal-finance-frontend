@@ -2,26 +2,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Form, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useApi } from "@/service/api";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
-const inputform = [
-  {
-    name: "username",
-    label: "Nome de usuário",
-    type: "text",
-    autoComplete: "off",
-  },
-  {
-    name: "password",
-    label: "Senha",
-    type: "password",
-    autoComplete: "off",
-  },
-];
 
 const formSchema = z.object({
   username: z.string({ message: "Nome de usuário é obrigatório" }).trim(),
@@ -29,6 +17,10 @@ const formSchema = z.object({
 });
 
 export const LoginPage = () => {
+  const navigate = useNavigate();
+  const { useLogin, useToken } = useApi();
+  useToken();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -37,63 +29,63 @@ export const LoginPage = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     console.log("Form Data:", data);
+    const resp = await useLogin({ email: data.username, password: data.password });
+
+    if (!resp) {
+      form.setError("password", { message: "Nome de usuário ou senha inválidos" });
+    }
+
+    navigate({ to: "/app/home" });
   };
 
   return (
     <div className="fixed w-full h-full flex justify-center items-center bg-[url('/src/assets/login-background.webp')] bg-cover bg-center">
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Card className="w-[300px] bg-blue-500/10 backdrop-blur-sm border border-blue-500/20">
-          <CardHeader>
-            <CardTitle>Login</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <FieldGroup>
-              <form.Field
-                name="username"
-                children={(field) => {
-                  return (
-                    <Field>
-                      <FieldLabel>{field.name}</FieldLabel>
-                      <Input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        autoComplete="off"
-                      />
-                    </Field>
-                  );
-                }}
-              />
-              <form.Field
-                name="password"
-                children={(field) => {
-                  return (
-                    <Field>
-                      <FieldLabel>{field.name}</FieldLabel>
-                      <Input
-                        id={field.name}
-                        name={field.name}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        autoComplete="off"
-                        type="password"
-                      />
-                    </Field>
-                  );
-                }}
-              />
-            </FieldGroup>
-          </CardContent>
-          <CardFooter className="flex-col gap-2">
-            <Button type="submit" className="w-full">
-              Login
-            </Button>
-          </CardFooter>
-        </Card>
-      </form>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <Card className="w-[300px] bg-blue-500/10 backdrop-blur-sm border border-blue-500/20">
+            <CardHeader>
+              <CardTitle>Login</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FieldGroup>
+                <FormField
+                  control={form.control}
+                  name="username"
+                  render={({ field }) => {
+                    return (
+                      <Field>
+                        <FieldLabel htmlFor={field.name}>{field.name}</FieldLabel>
+                        <Input id={field.name} {...field} />
+                        <FieldError>{form.formState.errors.username?.message}</FieldError>
+                      </Field>
+                    );
+                  }}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => {
+                    return (
+                      <Field>
+                        <FieldLabel htmlFor={field.name}>{field.name}</FieldLabel>
+                        <Input id={field.name} type="password" {...field} />
+                        <FieldError>{form.formState.errors.password?.message}</FieldError>
+                      </Field>
+                    );
+                  }}
+                />
+              </FieldGroup>
+            </CardContent>
+            <CardFooter className="flex-col gap-2">
+              <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                Login
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
+      </Form>
     </div>
   );
 };
