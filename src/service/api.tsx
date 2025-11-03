@@ -2,10 +2,10 @@ import { useNavigate } from "@tanstack/react-router";
 
 export const useApi = () => {
   const navigate = useNavigate();
+  const token = localStorage.getItem("authToken");
 
-  async function ApiFetch({ endpoint, options }: { endpoint: string; options: RequestInit }) {
+  async function ApiFetch({ endpoint, options, token }: { endpoint: string; options: RequestInit; token?: string }) {
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
-    const token = localStorage.getItem("authToken");
 
     const res = await fetch(`${baseUrl}${endpoint}`, {
       ...options,
@@ -43,14 +43,19 @@ export const useApi = () => {
   };
 
   const useToken = async () => {
+    if (!token) {
+      return navigate({ to: "/login" });
+    }
+
     await ApiFetch({
       endpoint: "/api/auth/token",
       options: {
         method: "GET",
       },
+      token,
     })
       .then((res) => {
-       if (res.ok) return navigate({ to: "/app/home" });
+        if (res.ok) return navigate({ to: "/app/home" });
       })
       .catch(() => {
         localStorage.removeItem("authToken");
@@ -67,5 +72,19 @@ export const useApi = () => {
     });
   };
 
-  return { useLogin, useToken, useHealth };
+  const useFilterMovement = async ({ month, year }: { month: string; year: string }) => {
+    if (!token) {
+      return navigate({ to: "/login" });
+    }
+
+    return await ApiFetch({
+      endpoint: "/api/movement/filter?" + `month=${month}` + "&" + `year=${year}`,
+      options: {
+        method: "GET",
+      },
+      token,
+    }).then((res) => res.json());
+  };
+
+  return { useLogin, useToken, useHealth, useFilterMovement };
 };
