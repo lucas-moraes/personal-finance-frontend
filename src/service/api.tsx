@@ -58,7 +58,6 @@ export const useApi = () => {
         if (res.ok) return navigate({ to: "/app/home" });
       })
       .catch(() => {
-        localStorage.removeItem("authToken");
         return navigate({ to: "/login" });
       });
   };
