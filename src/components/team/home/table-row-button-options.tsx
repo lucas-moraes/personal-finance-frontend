@@ -8,7 +8,7 @@ export const TableRowButtonOptions: React.FC<{
   onDeleteItem: () => void;
 }> = ({ onClose, onEditItem, onDeleteItem }) => {
   return (
-    <>
+    <div className="flex flex-col items-center gap-2">
       <Button variant="ghost" className="p-0 m-0 text-white cursor-pointer" onClick={onClose}>
         <X size={16} />
       </Button>
@@ -26,6 +26,6 @@ export const TableRowButtonOptions: React.FC<{
       >
         <Trash2 size={16} />
       </Button>
-    </>
+    </div>
   );
 };

@@ -55,7 +55,7 @@ export const HomePage = () => {
 
   return (
     <GlassCard shadowMode={true} cornerRadius={16} blurAmount={0.01}>
-      <Card className="w-[700px] p-5 bg-slate-950/50 text-white shadow-none border border-purple-400/10">
+      <Card className="w-[800px] p-5 bg-slate-950/50 text-white shadow-none border border-purple-400/10">
         <CardContent>
           <div className="flex w-full flex-col gap-6">
             <Tabs defaultValue="invoices">
@@ -74,6 +74,7 @@ export const HomePage = () => {
                 <div className="flex flex-col items-start mt-4 mb-4">
                   <div className="flex flex-row gap-4">
                     <InputSelect
+                      className="cursor-pointer"
                       placeholder="Category"
                       options={categories.data ?? [{ value: "teste", label: "teste" }]}
                       value={filterData.category}
@@ -82,7 +83,7 @@ export const HomePage = () => {
                       }}
                     />
                     <InputSelect
-                      className="w-[120px]"
+                      className="w-[120px] cursor-pointer"
                       placeholder="Month"
                       options={months.data ?? [{ value: "teste", label: "teste" }]}
                       value={filterData.month}
@@ -91,7 +92,7 @@ export const HomePage = () => {
                       }}
                     />
                     <InputSelect
-                      className="w-[80px]"
+                      className="w-[80px] cursor-pointer"
                       placeholder="Year"
                       options={years.data ?? [{ value: "teste", label: "teste" }]}
                       value={filterData.year}
@@ -101,7 +102,7 @@ export const HomePage = () => {
                     />
                     <Button
                       variant="outline"
-                      className="text-white"
+                      className="text-white cursor-pointer"
                       disabled={!filterData.isChanged}
                       onClick={() => {
                         FilterMovement();
@@ -137,7 +138,7 @@ export const HomePage = () => {
                                 (Number(invoice.valor) < 0 ? " text-pink-400" : " text-indigo-400")
                               }
                             >
-                              <TableCell className="flex flex-col w-[50px] font-medium gap-2">
+                              <TableCell className="w-[50px] font-medium gap-2">
                                 {showLineOptions !== Number(invoice.id) && (
                                   <Button
                                     variant="ghost"
@@ -163,7 +164,7 @@ export const HomePage = () => {
                               <TableCell className="w-[50px] font-medium">{`${invoice.dia}/${invoice.mes}/${invoice.ano}`}</TableCell>
                               <TableCell>{invoice.categoriaDescricao}</TableCell>
                               <TableCell className="capitalize">{invoice.tipo}</TableCell>
-                              <TableCell>{invoice.descricao}</TableCell>
+                              <TableCell className="whitespace-normal">{invoice.descricao}</TableCell>
                               <TableCell className="text-right">
                                 {FormatNumberToCurrency(Number(invoice.valor))}
                               </TableCell>
