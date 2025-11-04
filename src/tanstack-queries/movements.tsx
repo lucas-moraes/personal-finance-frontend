@@ -17,13 +17,14 @@ type TInvoice = {
 
 export const useQueryMovements = ({ month, category, year }: { month: string; category: string; year: string }) => {
   const { useFilterMovement } = useApi();
+  const filterMovement = useFilterMovement;
 
-  const query = category ? { month, year, category } : { month, year };
+  const query = { month, year, category };
 
   return useQuery<TInvoice>({
     queryKey: ["movements", month, year, category],
     queryFn: async () => {
-      return await useFilterMovement(query);
+      return await filterMovement(query);
     },
     enabled: !!month && !!year,
   });

@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { GlassCard } from "@developer-hub/liquid-glass";
 import { Button } from "@/components/ui/button";
-import { EllipsisVertical, ListFilter } from "lucide-react";
+import { EllipsisVertical} from "lucide-react";
 import { FormatNumberToCurrency } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InputSelect } from "@/components/team/input-select";
@@ -31,7 +31,7 @@ export const HomePage = () => {
   const categories = useQueryCategories();
   const months = useQueryMonths();
   const years = useQueryYears();
-  const { data, isLoading, isError, refetch, isFetching } = useQueryMovements({
+  const { data } = useQueryMovements({
     month: filterData.month ?? "",
     year: filterData.year ?? "",
     category: filterData.category ?? "",
@@ -81,7 +81,6 @@ export const HomePage = () => {
                         setFilterData((prev) => ({ ...prev, category: value, isChanged: true }));
                       }}
                     />
-
                     <InputSelect
                       className="w-[120px]"
                       placeholder="Month"
