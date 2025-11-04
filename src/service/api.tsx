@@ -17,8 +17,10 @@ export const useApi = () => {
     });
 
     if (!res.ok) {
-      const errorData = await res.json();
-      throw new Error(errorData.message || "API request failed");
+      if( res.status === 401 ) {
+        localStorage.removeItem("authToken");
+        navigate({ to: "/login" });
+      }
     }
 
     return res;
@@ -71,13 +73,13 @@ export const useApi = () => {
     });
   };
 
-  const useFilterMovement = async ({ month, year }: { month: string; year: string }) => {
+  const useFilterMovement = async ({ month, year, category }: { month: string; year: string, category: string }) => {
     if (!token) {
       return navigate({ to: "/login" });
     }
 
     return await ApiFetch({
-      endpoint: "/api/movement/filter?" + `month=${month}` + "&" + `year=${year}`,
+      endpoint: "/api/movement/filter?" + `month=${month}` + "&" + `year=${year} ` + (category ? "&" + `category=${category}` : ""),
       options: {
         method: "GET",
       },
@@ -85,5 +87,48 @@ export const useApi = () => {
     }).then((res) => res.json());
   };
 
-  return { useLogin, useToken, useHealth, useFilterMovement };
+  const useCategory = async () => {
+    if (!token) {
+      return navigate({ to: "/login" });
+    }
+
+    return await ApiFetch({
+      endpoint: "/api/category/get-all",
+      options: {
+        method: "GET",
+      },
+      token,
+    }).then((res) => res.json());
+
+  }
+
+  const useMonth = async () => {
+    if (!token) {
+      return navigate({ to: "/login" });
+    }
+    
+    return await ApiFetch({
+      endpoint: "/api/movement/months",
+      options: {
+        method: "GET",
+      },
+      token,
+    }).then((res) => res.json());
+  };
+
+  const useYear = async () => {
+    if (!token) {
+      return navigate({ to: "/login" });
+    }
+
+    return await ApiFetch({
+      endpoint: "/api/movement/years",
+      options: {
+        method: "GET",
+      },
+      token,
+    }).then((res) => res.json());
+  };
+
+  return { useLogin, useToken, useHealth, useFilterMovement, useCategory, useMonth , useYear};
 };

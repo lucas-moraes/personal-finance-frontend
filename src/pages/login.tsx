@@ -5,9 +5,11 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Form, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/ui/spinner";
 import { useApi } from "@/service/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "@tanstack/react-router";
+import { useLayoutEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -19,7 +21,6 @@ const formSchema = z.object({
 export const LoginPage = () => {
   const navigate = useNavigate();
   const { useLogin, useToken } = useApi();
-  useToken();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -30,7 +31,6 @@ export const LoginPage = () => {
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log("Form Data:", data);
     const resp = await useLogin({ email: data.username, password: data.password });
 
     if (!resp) {
@@ -39,6 +39,10 @@ export const LoginPage = () => {
 
     navigate({ to: "/app/home" });
   };
+
+  useLayoutEffect(() => {
+    useToken();
+  }, []);
 
   return (
     <div className="fixed w-full h-full flex justify-center items-center bg-[url('/src/assets/login-background.webp')] bg-cover bg-center">
@@ -80,7 +84,8 @@ export const LoginPage = () => {
             </CardContent>
             <CardFooter className="flex-col gap-2">
               <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                Login
+                {!form.formState.isSubmitting && 'Login'}
+                {form.formState.isSubmitting && <Spinner/>}
               </Button>
             </CardFooter>
           </Card>

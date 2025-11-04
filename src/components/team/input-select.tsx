@@ -4,11 +4,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 export const InputSelect: React.FC<{
   className?: string;
   placeholder: string;
+  value?: string;
   options: Array<{ value: string; label: string }>;
   onSelect: (opt: string) => void;
-}> = ({ className, placeholder, options, onSelect }) => {
+}> = ({ className, placeholder, options, value, onSelect }) => {
   return (
-    <Select onValueChange={onSelect}>
+    <Select value={value} onValueChange={onSelect}>
       <SelectTrigger className={className}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

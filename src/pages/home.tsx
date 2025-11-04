@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useId } from "react";
+import { useEffect, useId, useLayoutEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { GlassCard } from "@developer-hub/liquid-glass";
@@ -12,39 +12,44 @@ import { InputSelect } from "@/components/team/input-select";
 import { TableRowButtonOptions } from "@/components/team/home/table-row-button-options";
 import { CardEditInvoice } from "@/components/team/home/card-edit-invoice";
 import { useApi } from "@/service/api";
-
-type TInvoice = {
-  movements: Array<{
-    ano: number;
-    categoriaDescricao: string;
-    descricao: string;
-    dia: number;
-    id: string;
-    mes: number;
-    tipo: string;
-    valor: number;
-  }>;
-  total: number;
-};
+import { useQueryCategories } from "@/tanstack-queries/categories";
+import { useQueryMonths } from "@/tanstack-queries/months";
+import { useQueryYears } from "@/tanstack-queries/years";
+import { useQueryMovements } from "@/tanstack-queries/movements";
 
 export const HomePage = () => {
-  const { useToken, useFilterMovement } = useApi();
-
-  const [editItem, setEditItem] = React.useState<number | null>(null);
-  const [showLineOptions, setShowLineOptions] = React.useState<number | null>(null);
-  const [invoices, setInvoices] = React.useState<TInvoice>({ movements: [], total: 0 });
+  const { useToken } = useApi();
+  const [editItem, setEditItem] = useState<number | null>(null);
+  const [showLineOptions, setShowLineOptions] = useState<number | null>(null);
+  const [filterData, setFilterData] = useState<{
+    category?: string;
+    month?: string;
+    year?: string;
+    isChanged?: boolean;
+  }>({});
   const id = useId();
+  const categories = useQueryCategories();
+  const months = useQueryMonths();
+  const years = useQueryYears();
+  const { data, isLoading, isError, refetch, isFetching } = useQueryMovements({
+    month: filterData.month ?? "",
+    year: filterData.year ?? "",
+    category: filterData.category ?? "",
+  });
 
   async function FilterMovement() {
     const day = new Date();
-    const month = (day.getMonth()+1).toString();
+    const month = (day.getMonth() + 1).toString();
     const year = day.getFullYear().toString();
-    const resp = await useFilterMovement({ month, year });
-    setInvoices(resp!);
+
+    setFilterData({ month, year });
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     useToken();
+  }, []);
+
+  useEffect(() => {
     FilterMovement();
   }, []);
 
@@ -70,29 +75,40 @@ export const HomePage = () => {
                   <div className="flex flex-row gap-4">
                     <InputSelect
                       placeholder="Category"
-                      options={[{ value: "teste", label: "teste" }]}
+                      options={categories.data ?? [{ value: "teste", label: "teste" }]}
+                      value={filterData.category}
                       onSelect={(value: string) => {
-                        console.log(`=>`, value);
+                        setFilterData((prev) => ({ ...prev, category: value, isChanged: true }));
                       }}
                     />
+
                     <InputSelect
                       className="w-[120px]"
                       placeholder="Month"
-                      options={[{ value: "teste", label: "teste" }]}
+                      options={months.data ?? [{ value: "teste", label: "teste" }]}
+                      value={filterData.month}
                       onSelect={(value: string) => {
-                        console.log(`=>`, value);
+                        setFilterData((prev) => ({ ...prev, month: value, isChanged: true }));
                       }}
                     />
                     <InputSelect
                       className="w-[80px]"
                       placeholder="Year"
-                      options={[{ value: "teste", label: "teste" }]}
+                      options={years.data ?? [{ value: "teste", label: "teste" }]}
+                      value={filterData.year}
                       onSelect={(value: string) => {
-                        console.log(`=>`, value);
+                        setFilterData((prev) => ({ ...prev, year: value, isChanged: true }));
                       }}
                     />
-                    <Button variant="outline" className="text-white">
-                      <ListFilter />
+                    <Button
+                      variant="outline"
+                      className="text-white"
+                      disabled={!filterData.isChanged}
+                      onClick={() => {
+                        FilterMovement();
+                      }}
+                    >
+                      Clean Filters
                     </Button>
                   </div>
                 </div>
@@ -110,7 +126,7 @@ export const HomePage = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {invoices?.movements.map((invoice) => {
+                      {data?.movements.map((invoice) => {
                         if ("total" in invoice) return null;
 
                         return (
@@ -174,14 +190,12 @@ export const HomePage = () => {
                 <div className="max-h-[500px]">
                   <Table>
                     <TableFooter>
-                      <TableRow className={Number(invoices?.total) < 0 ? " text-pink-400" : " text-indigo-400"}>
+                      <TableRow className={Number(data?.total) < 0 ? " text-pink-400" : " text-indigo-400"}>
                         <TableCell colSpan={5}>Total</TableCell>
                         <TableCell
-                          className={
-                            "text-right" + (Number(invoices?.total) < 0 ? " text-pink-400" : " text-indigo-400")
-                          }
+                          className={"text-right" + (Number(data?.total) < 0 ? " text-pink-400" : " text-indigo-400")}
                         >
-                          {FormatNumberToCurrency(Number(invoices?.total))}
+                          {FormatNumberToCurrency(Number(data?.total))}
                         </TableCell>
                       </TableRow>
                     </TableFooter>
