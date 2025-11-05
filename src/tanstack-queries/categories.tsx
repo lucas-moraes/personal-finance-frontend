@@ -20,10 +20,12 @@ export const useQueryCategories = () => {
       return resp;
     },
     select: (data): FormattedCategory[] => {
-      return data.map((category) => ({
+      const list = data.map((category) => ({
         value: category.id,
         label: category.descricao,
       }));
+      list.unshift({ value: "empty", label: "No select" });
+      return list;
     },
   });
 };

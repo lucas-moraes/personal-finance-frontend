@@ -1,24 +1,22 @@
 "use client";
 
-import { useEffect, useId, useLayoutEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { GlassCard } from "@developer-hub/liquid-glass";
 import { Button } from "@/components/ui/button";
-import { EllipsisVertical} from "lucide-react";
+import { EllipsisVertical, X } from "lucide-react";
 import { FormatNumberToCurrency } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { InputSelect } from "@/components/team/input-select";
 import { TableRowButtonOptions } from "@/components/team/home/table-row-button-options";
 import { CardEditInvoice } from "@/components/team/home/card-edit-invoice";
-import { useApi } from "@/service/api";
 import { useQueryCategories } from "@/tanstack-queries/categories";
 import { useQueryMonths } from "@/tanstack-queries/months";
 import { useQueryYears } from "@/tanstack-queries/years";
 import { useQueryMovements } from "@/tanstack-queries/movements";
 
 export const HomePage = () => {
-  const { useToken } = useApi();
   const [editItem, setEditItem] = useState<number | null>(null);
   const [showLineOptions, setShowLineOptions] = useState<number | null>(null);
   const [filterData, setFilterData] = useState<{
@@ -37,20 +35,32 @@ export const HomePage = () => {
     category: filterData.category ?? "",
   });
 
-  async function FilterMovement() {
+  async function InitialMovement() {
     const day = new Date();
     const month = (day.getMonth() + 1).toString();
     const year = day.getFullYear().toString();
 
-    setFilterData({ month, year });
+    setFilterData({ category: "", month, year });
   }
 
-  useLayoutEffect(() => {
-    useToken();
-  }, []);
+  function CheckFilters({ origin, value }: { origin: "category" | "month" | "year"; value: string }) {
+    switch (origin) {
+      case "category":
+        setFilterData((prev) => ({ ...prev, category: value === "empty" ? "" : value, isChanged: true }));
+        break;
+      case "month":
+        setFilterData((prev) => ({ ...prev, month: value === "empty" ? "" : value, isChanged: true }));
+        break;
+      case "year":
+        setFilterData((prev) => ({ ...prev, year: value === "empty" ? "" : value, isChanged: true }));
+        break;
+      default:
+        break;
+    }
+  }
 
   useEffect(() => {
-    FilterMovement();
+    InitialMovement();
   }, []);
 
   return (
@@ -71,7 +81,7 @@ export const HomePage = () => {
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="invoices">
-                <div className="flex flex-col items-start mt-4 mb-4">
+                <div className="flex flex-col content-center items-start mt-4 mb-4">
                   <div className="flex flex-row gap-4">
                     <InputSelect
                       className="cursor-pointer"
@@ -79,7 +89,7 @@ export const HomePage = () => {
                       options={categories.data ?? [{ value: "teste", label: "teste" }]}
                       value={filterData.category}
                       onSelect={(value: string) => {
-                        setFilterData((prev) => ({ ...prev, category: value, isChanged: true }));
+                        CheckFilters({ origin: "category", value });
                       }}
                     />
                     <InputSelect
@@ -88,7 +98,7 @@ export const HomePage = () => {
                       options={months.data ?? [{ value: "teste", label: "teste" }]}
                       value={filterData.month}
                       onSelect={(value: string) => {
-                        setFilterData((prev) => ({ ...prev, month: value, isChanged: true }));
+                        CheckFilters({ origin: "month", value });
                       }}
                     />
                     <InputSelect
@@ -97,19 +107,17 @@ export const HomePage = () => {
                       options={years.data ?? [{ value: "teste", label: "teste" }]}
                       value={filterData.year}
                       onSelect={(value: string) => {
-                        setFilterData((prev) => ({ ...prev, year: value, isChanged: true }));
+                        CheckFilters({ origin: "year", value });
                       }}
                     />
-                    <Button
-                      variant="outline"
-                      className="text-white cursor-pointer"
-                      disabled={!filterData.isChanged}
-                      onClick={() => {
-                        FilterMovement();
-                      }}
-                    >
-                      Clean Filters
-                    </Button>
+                    {filterData.isChanged && (
+                      <X
+                        className=" self-center rounded-full text-red-500 cursor-pointer"
+                        onClick={() => {
+                          InitialMovement();
+                        }}
+                      />
+                    )}
                   </div>
                 </div>
 

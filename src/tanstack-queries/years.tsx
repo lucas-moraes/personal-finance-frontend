@@ -20,10 +20,12 @@ export const useQueryYears = () => {
       return resp;
     },
     select: (data): Array<FormattedYear> => {
-      return data.map((year) => ({
+      const list = data.map((year) => ({
         value: String(year.id),
         label: String(year.ano),
       }));
+      list.unshift({ value: "empty", label: "No select" });
+      return list;
     },
   });
 };

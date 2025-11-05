@@ -26,6 +26,6 @@ export const useQueryMovements = ({ month, category, year }: { month: string; ca
     queryFn: async () => {
       return await filterMovement(query);
     },
-    enabled: !!month && !!year,
+    enabled: !!year,
   });
 };

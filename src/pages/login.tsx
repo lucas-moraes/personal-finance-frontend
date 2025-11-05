@@ -9,7 +9,6 @@ import { Spinner } from "@/components/ui/spinner";
 import { useApi } from "@/service/api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "@tanstack/react-router";
-import { useLayoutEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -20,7 +19,7 @@ const formSchema = z.object({
 
 export const LoginPage = () => {
   const navigate = useNavigate();
-  const { useLogin, useToken } = useApi();
+  const { useLogin } = useApi();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -39,10 +38,6 @@ export const LoginPage = () => {
 
     navigate({ to: "/app/home" });
   };
-
-  useLayoutEffect(() => {
-    useToken();
-  }, []);
 
   return (
     <div className="fixed w-full h-full flex justify-center items-center bg-[url('/src/assets/login-background.webp')] bg-cover bg-center">

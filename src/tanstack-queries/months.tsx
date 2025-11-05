@@ -20,10 +20,12 @@ export const useQueryMonths = () => {
       return resp;
     },
     select: (data): Array<FormattedMonth> => {
-      return data.map((month) => ({
+      const list = data.map((month) => ({
         value: String(month.id),
         label: month.mes,
       }));
+      list.unshift({ value: "empty", label: "No select" });
+      return list;
     },
   });
 };
