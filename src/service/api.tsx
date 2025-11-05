@@ -17,7 +17,7 @@ export const useApi = () => {
     });
 
     if (!res.ok) {
-      if( res.status === 401 ) {
+      if (res.status === 401) {
         localStorage.removeItem("authToken");
         navigate({ to: "/login" });
       }
@@ -73,13 +73,18 @@ export const useApi = () => {
     });
   };
 
-  const useFilterMovement = async ({ month, year, category }: { month: string; year: string, category: string }) => {
+  const useFilterMovement = async ({ month, year, category }: { month: string; year: string; category: string }) => {
     if (!token) {
       return navigate({ to: "/login" });
     }
 
     return await ApiFetch({
-      endpoint: "/api/movement/filter?" + `month=${month}` + "&" + `year=${year} ` + (category ? "&" + `category=${category}` : ""),
+      endpoint:
+        "/api/movement/filter?" +
+        `month=${month}` +
+        "&" +
+        `year=${year} ` +
+        (category ? "&" + `category=${category}` : ""),
       options: {
         method: "GET",
       },
@@ -99,14 +104,13 @@ export const useApi = () => {
       },
       token,
     }).then((res) => res.json());
-
-  }
+  };
 
   const useMonth = async () => {
     if (!token) {
       return navigate({ to: "/login" });
     }
-    
+
     return await ApiFetch({
       endpoint: "/api/movement/months",
       options: {
@@ -130,5 +134,22 @@ export const useApi = () => {
     }).then((res) => res.json());
   };
 
-  return { useLogin, useToken, useHealth, useFilterMovement, useCategory, useMonth , useYear};
+  const useLogout = async () => {
+    if (!token) {
+      return navigate({ to: "/login" });
+    }
+    const resp = await ApiFetch({
+      endpoint: "/api/auth/logout",
+      options: {
+        method: "POST",
+      },
+      token,
+    });
+    if (resp.status === 200) {
+      localStorage.removeItem("authToken");
+      navigate({ to: "/login" });
+    }
+  };
+
+  return { useLogin, useToken, useHealth, useFilterMovement, useCategory, useMonth, useYear, useLogout };
 };
