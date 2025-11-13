@@ -189,6 +189,20 @@ export const useApi = () => {
     }).then((res) => res);
   };
 
+  const useDeleteMovement = async ({ id }: { id: string }) => {
+    if (!token) {
+      return navigate({ to: "/login" });
+    }
+
+    return await ApiFetch({
+      endpoint: `/api/movement/${id}`,
+      options: {
+        method: "DELETE",
+      },
+      token,
+    }).then((res) => res);
+  }
+
   return {
     useLogin,
     useToken,
@@ -200,5 +214,6 @@ export const useApi = () => {
     useLogout,
     useFilterById,
     useUpdateMovement,
+    useDeleteMovement,
   };
 };

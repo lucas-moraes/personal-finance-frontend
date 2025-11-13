@@ -14,7 +14,7 @@ import { CardEditInvoice } from "@/components/team/home/card-edit-invoice";
 import { useQueryCategories } from "@/tanstack-queries/categories";
 import { useQueryMonths } from "@/tanstack-queries/months";
 import { useQueryYears } from "@/tanstack-queries/years";
-import { useQueryFilterMovementById, useQueryMovements } from "@/tanstack-queries/movements";
+import { useDeleteMovement, useQueryFilterMovementById, useQueryMovements } from "@/tanstack-queries/movements";
 
 export const HomePage = () => {
   const [editItem, setEditItem] = useState<number | null>(null);
@@ -29,6 +29,7 @@ export const HomePage = () => {
   const categories = useQueryCategories();
   const months = useQueryMonths();
   const years = useQueryYears();
+  const deleteMovement = useDeleteMovement();
   const { data } = useQueryMovements({
     month: filterData.month,
     year: filterData.year,
@@ -42,6 +43,10 @@ export const HomePage = () => {
 
   function ResetFilters() {
     setFilterData({ category: "", month: "", year: "", isChanged: false });
+  }
+
+  function DeleteMovement({ id }: { id: string }) {
+    deleteMovement.mutate({ id });
   }
 
   function CheckFilters({ origin, value }: { origin: "category" | "month" | "year"; value: string }) {
@@ -166,7 +171,9 @@ export const HomePage = () => {
                                     onEditItem={() => {
                                       setEditItem(Number(invoice.id));
                                     }}
-                                    onDeleteItem={() => {}}
+                                    onDeleteItem={() => {
+                                      DeleteMovement({ id: invoice.id });
+                                    }}
                                   />
                                 )}
                               </TableCell>

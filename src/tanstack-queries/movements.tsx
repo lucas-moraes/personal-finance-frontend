@@ -46,6 +46,26 @@ export const useQueryMovements = ({ month, category, year }: { month?: string; c
   });
 };
 
+export const useDeleteMovement = () => {
+  const queryClient = useQueryClient();
+  const { useDeleteMovement } = useApi();
+
+  return useMutation({
+    mutationKey: ["delete-movement"],
+    mutationFn: async ({ id }: { id: string }) => {
+      return await useDeleteMovement({ id });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === "movements",
+      });
+    },
+    onError: (error) => {
+      console.error("Error deleting movement:", error);
+    },
+  });
+};
+
 export const useUpdateMovement = () => {
   const queryClient = useQueryClient();
   const { useUpdateMovement } = useApi();
@@ -65,10 +85,7 @@ export const useUpdateMovement = () => {
       const previousMovements = queryClient.getQueryData<any[]>(["movements"]);
 
       if (previousMovements) {
-        queryClient.setQueryData(
-          ["movements"],
-          previousMovements
-        );
+        queryClient.setQueryData(["movements"], previousMovements);
       }
 
       queryClient.setQueryData(["movement-by-id", Number(id)], (old: any) => ({
