@@ -8,9 +8,16 @@ import { Calendar } from "@/components/ui/calendar";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-export function Datepicker() {
+export function Datepicker({selected, onSelect}: {selected?: Date, onSelect: (date: Date | undefined) => void}) {
   const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>(undefined);
+
+
+  React.useEffect(() => {
+    if (selected) {
+      setDate(selected);
+    }
+  }, [selected]);
 
   return (
     <div className="flex flex-col gap-3 mt-1">
@@ -32,6 +39,7 @@ export function Datepicker() {
             onSelect={(date) => {
               setDate(date);
               setOpen(false);
+              onSelect(date)
             }}
           />
         </PopoverContent>

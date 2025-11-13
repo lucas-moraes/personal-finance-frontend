@@ -1,5 +1,15 @@
 import { useNavigate } from "@tanstack/react-router";
 
+interface IUpdateMovement {
+  dia: number;
+  mes: number;
+  ano: number;
+  tipo: string;
+  categoria: number;
+  descricao: string | null;
+  valor: number;
+}
+
 export const useApi = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("authToken");
@@ -81,9 +91,8 @@ export const useApi = () => {
     return await ApiFetch({
       endpoint:
         "/api/movement/filter?" +
-        `month=${month}` +
-        "&" +
-        `year=${year} ` +
+        (month ? "&" + `month=${month}` : "") +
+        (year ? "&" + `year=${year}` : "") +
         (category ? "&" + `category=${category}` : ""),
       options: {
         method: "GET",
@@ -151,5 +160,45 @@ export const useApi = () => {
     }
   };
 
-  return { useLogin, useToken, useHealth, useFilterMovement, useCategory, useMonth, useYear, useLogout };
+  const useFilterById = async ({ id }: { id: number }) => {
+    if (!token) {
+      return navigate({ to: "/login" });
+    }
+
+    return await ApiFetch({
+      endpoint: `/api/movement/get-by-id/${id}`,
+      options: {
+        method: "GET",
+      },
+      token,
+    }).then((res) => res.json());
+  };
+
+  const useUpdateMovement = async ({ id, data }: { id: string; data: IUpdateMovement }) => {
+    if (!token) {
+      return navigate({ to: "/login" });
+    }
+
+    return await ApiFetch({
+      endpoint: `/api/movement/${id}`,
+      options: {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      },
+      token,
+    }).then((res) => res);
+  };
+
+  return {
+    useLogin,
+    useToken,
+    useHealth,
+    useFilterMovement,
+    useCategory,
+    useMonth,
+    useYear,
+    useLogout,
+    useFilterById,
+    useUpdateMovement,
+  };
 };

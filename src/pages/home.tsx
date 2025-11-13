@@ -14,7 +14,7 @@ import { CardEditInvoice } from "@/components/team/home/card-edit-invoice";
 import { useQueryCategories } from "@/tanstack-queries/categories";
 import { useQueryMonths } from "@/tanstack-queries/months";
 import { useQueryYears } from "@/tanstack-queries/years";
-import { useQueryMovements } from "@/tanstack-queries/movements";
+import { useQueryFilterMovementById, useQueryMovements } from "@/tanstack-queries/movements";
 
 export const HomePage = () => {
   const [editItem, setEditItem] = useState<number | null>(null);
@@ -30,17 +30,14 @@ export const HomePage = () => {
   const months = useQueryMonths();
   const years = useQueryYears();
   const { data } = useQueryMovements({
-    month: filterData.month ?? "",
-    year: filterData.year ?? "",
-    category: filterData.category ?? "",
+    month: filterData.month,
+    year: filterData.year,
+    category: filterData.category,
   });
+  const dataToEdit = useQueryFilterMovementById({id: editItem!})
 
   async function InitialMovement() {
-    const day = new Date();
-    const month = (day.getMonth() + 1).toString();
-    const year = day.getFullYear().toString();
-
-    setFilterData({ category: "", month, year });
+    setFilterData({});
   }
 
   function CheckFilters({ origin, value }: { origin: "category" | "month" | "year"; value: string }) {
@@ -177,11 +174,12 @@ export const HomePage = () => {
                                 {FormatNumberToCurrency(Number(invoice.valor))}
                               </TableCell>
                             </TableRow>
-                            {editItem === Number(invoice.id) && (
+                            {editItem === Number(invoice.id) && Array.isArray(dataToEdit?.data) && (
                               <TableRow className="bg-violet-600/10 hover:bg-violet-600/10 border-b border-white/20 ">
                                 <TableCell colSpan={6} className="p-4">
                                   <CardEditInvoice
-                                    title="Edit Invoice"
+                                    item={{id: editItem.toString(),  data: dataToEdit?.data!}}
+                                    listCategories={categories.data!}
                                     onClose={() => {
                                       setEditItem(null);
                                     }}
