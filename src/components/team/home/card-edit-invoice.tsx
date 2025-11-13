@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import type React from "react";
 import { useUpdateMovement, type TMovementById } from "@/tanstack-queries/movements";
 import { useEffect, useState } from "react";
+import { FormatNumberToCurrency } from "@/lib/utils";
 
 type TData = {
   date: Date | undefined;
@@ -121,7 +122,7 @@ export const CardEditInvoice: React.FC<{
               <InputGroupInput
                 className="pb-1"
                 placeholder="0.00"
-                value={data.amount}
+                value={FormatNumberToCurrency(data.amount).replace("R$", "").trim()}
                 onChange={(e) => setData((prev) => ({ ...prev, amount: Number(e.target.value) || 0 }))}
               />
             </InputGroup>
