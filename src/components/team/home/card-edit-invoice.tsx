@@ -32,7 +32,7 @@ export const CardEditInvoice: React.FC<{
   const updateMovement = useUpdateMovement();
 
   async function handleUpdateMovement({ id, data }: { id: string; data: TData }) {
-    const dia = data.date?.getDay();
+    const dia = data.date?.getDate();
     const mes = data.date?.getMonth()! + 1;
     const ano = data.date?.getFullYear();
 

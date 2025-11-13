@@ -28,8 +28,8 @@ export type TMovementById = {
 
 export const useQueryMovements = ({ month, category, year }: { month?: string; category?: string; year?: string }) => {
   const { useFilterMovement } = useApi();
-  let safeMonth: string,
-    safeYear: string,
+  let safeMonth: string = month ? month : "",
+    safeYear: string = year ? year : "",
     safeCategory: string = category ? category : "";
 
   if (!month && !year && !category) {
@@ -39,9 +39,9 @@ export const useQueryMovements = ({ month, category, year }: { month?: string; c
   }
 
   return useQuery<TInvoice>({
-    queryKey: ["movements"],
+    queryKey: ["movements", safeMonth, safeYear, safeCategory],
     queryFn: async () => {
-      return await useFilterMovement({ month: safeMonth, year: safeYear, category: safeCategory });
+      return await useFilterMovement({ month: safeMonth!, year: safeYear!, category: safeCategory! });
     },
   });
 };

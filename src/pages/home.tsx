@@ -34,10 +34,14 @@ export const HomePage = () => {
     year: filterData.year,
     category: filterData.category,
   });
-  const dataToEdit = useQueryFilterMovementById({id: editItem!})
+  const dataToEdit = useQueryFilterMovementById({ id: editItem! });
 
-  async function InitialMovement() {
+  function InitialMovement() {
     setFilterData({});
+  }
+
+  function ResetFilters() {
+    setFilterData({ category: "", month: "", year: "", isChanged: false });
   }
 
   function CheckFilters({ origin, value }: { origin: "category" | "month" | "year"; value: string }) {
@@ -111,7 +115,7 @@ export const HomePage = () => {
                       <X
                         className=" self-center rounded-full text-red-500 cursor-pointer"
                         onClick={() => {
-                          InitialMovement();
+                          ResetFilters();
                         }}
                       />
                     )}
@@ -178,7 +182,7 @@ export const HomePage = () => {
                               <TableRow className="bg-violet-600/10 hover:bg-violet-600/10 border-b border-white/20 ">
                                 <TableCell colSpan={6} className="p-4">
                                   <CardEditInvoice
-                                    item={{id: editItem.toString(),  data: dataToEdit?.data!}}
+                                    item={{ id: editItem.toString(), data: dataToEdit?.data! }}
                                     listCategories={categories.data!}
                                     onClose={() => {
                                       setEditItem(null);
