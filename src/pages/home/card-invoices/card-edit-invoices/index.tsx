@@ -2,13 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Datepicker } from "@/components/ui/datepicker";
 import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
 import { Save, X } from "lucide-react";
-import { InputSelect } from "../input-select";
 import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@/components/ui/input-group";
 import { Input } from "@/components/ui/input";
 import type React from "react";
 import { useUpdateMovement, type TMovementById } from "@/tanstack-queries/movements";
 import { useEffect, useState } from "react";
 import { FormatNumberToCurrency } from "@/lib/utils";
+import { InputSelect } from "@/components/team/input-select";
 
 type TData = {
   date: Date | undefined;
