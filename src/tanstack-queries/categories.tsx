@@ -1,5 +1,5 @@
 import { useApi } from "@/service/api";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 type RawCategory = {
   id: string;
@@ -26,6 +26,26 @@ export const useQueryCategories = () => {
       }));
       list.unshift({ value: "empty", label: "No select" });
       return list;
+    },
+  });
+};
+
+export const useCreateCategory = () => {
+  const queryClient = useQueryClient();
+  const { useCreateCategory } = useApi();
+
+  return useMutation({
+    mutationKey: ["categories-create"],
+    mutationFn: async ({ description }: { description: string }) => {
+      return await useCreateCategory({ description });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === "categories",
+      });
+    },
+    onError: (error) => {
+      console.error("Error create category:", error);
     },
   });
 };

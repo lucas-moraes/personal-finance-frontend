@@ -203,6 +203,21 @@ export const useApi = () => {
     }).then((res) => res);
   }
 
+  const useCreateCategory = async ({ description }: { description: string }) => {
+    if (!token) {
+      return navigate({ to: "/login" });
+    }
+
+    return await ApiFetch({
+      endpoint: `/api/category/create`,
+      options: {
+        method: "POST",
+        body: JSON.stringify({ description }),
+      },
+      token,
+    }).then((res) => res);
+  }
+
   return {
     useLogin,
     useToken,
@@ -215,5 +230,6 @@ export const useApi = () => {
     useFilterById,
     useUpdateMovement,
     useDeleteMovement,
+    useCreateCategory,
   };
 };
