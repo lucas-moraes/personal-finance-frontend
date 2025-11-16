@@ -1,6 +1,3 @@
-import { Button } from "@/components/ui/button";
-import { Field, FieldSet } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@/components/ui/input-group";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useCreateCategory, useQueryCategories } from "@/tanstack-queries/categories";

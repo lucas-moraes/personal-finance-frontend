@@ -1,7 +1,7 @@
 import { useApi } from "@/service/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-type TInvoice = {
+export type TInvoice = {
   movements: Array<{
     ano: number;
     categoriaDescricao: string;
@@ -125,3 +125,23 @@ export const useQueryFilterMovementById = ({ id }: { id: number }) => {
     enabled: !!id,
   });
 };
+
+export const useCreateMovement = () => {
+  const queryClient = useQueryClient();
+  const { useCreateMovement } = useApi();
+
+  return useMutation({
+    mutationKey: ["create-movement"],
+    mutationFn: async (data: Omit<TMovementById, "id">) => {
+      return await useCreateMovement(data);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        predicate: (query) => query.queryKey[0] === "movements",
+      });
+    },
+    onError: (error) => {
+      console.error("Error creating movement:", error);
+    },
+  });
+}

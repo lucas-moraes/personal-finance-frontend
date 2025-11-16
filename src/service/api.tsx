@@ -218,6 +218,21 @@ export const useApi = () => {
     }).then((res) => res);
   }
 
+  const useCreateMovement = async (data: IUpdateMovement) => {
+    if (!token) {
+      return navigate({ to: "/login" });
+    }
+
+    return await ApiFetch({
+      endpoint: `/api/movement/create`,
+      options: {
+        method: "POST",
+        body: JSON.stringify(data),
+      },
+      token,
+    }).then((res) => res);
+  }
+
   return {
     useLogin,
     useToken,
@@ -231,5 +246,6 @@ export const useApi = () => {
     useUpdateMovement,
     useDeleteMovement,
     useCreateCategory,
+    useCreateMovement,
   };
 };
