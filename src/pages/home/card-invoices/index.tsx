@@ -12,7 +12,7 @@ import { useEffect, useId, useState } from "react";
 import { CardEditInvoice } from "./card-edit-invoices";
 
 export const CardInvoicesList = () => {
- const [editItem, setEditItem] = useState<number | null>(null);
+  const [editItem, setEditItem] = useState<number | null>(null);
   const [showLineOptions, setShowLineOptions] = useState<number | null>(null);
   const [filterData, setFilterData] = useState<{
     category?: string;
@@ -33,11 +33,10 @@ export const CardInvoicesList = () => {
   const dataToEdit = useQueryFilterMovementById({ id: editItem! });
 
   function InitialMovement() {
-    setFilterData({});
-  }
-
-  function ResetFilters() {
-    setFilterData({ category: "", month: "", year: "", isChanged: false });
+    const today = new Date();
+    const safeMonth = (today.getMonth() + 1).toString();
+    const safeYear = today.getFullYear().toString();
+    setFilterData({ category: "", month: safeMonth, year: safeYear, isChanged: false });
   }
 
   function DeleteMovement({ id }: { id: string }) {
@@ -87,7 +86,7 @@ export const CardInvoicesList = () => {
             }}
           />
           <InputSelect
-            className="w-[80px] cursor-pointer"
+            className="w-[120px] cursor-pointer"
             placeholder="Year"
             options={years.data ?? [{ value: "teste", label: "teste" }]}
             value={filterData.year}
@@ -97,9 +96,9 @@ export const CardInvoicesList = () => {
           />
           {filterData.isChanged && (
             <X
-              className=" self-center rounded-full text-red-500 cursor-pointer"
+              className="self-center rounded-full text-red-500 cursor-pointer"
               onClick={() => {
-                ResetFilters();
+                InitialMovement();
               }}
             />
           )}
