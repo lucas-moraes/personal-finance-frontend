@@ -19,6 +19,7 @@ export const useQueryCategories = () => {
       const resp: RawCategory[] = await useCategory();
       return resp;
     },
+    staleTime: Infinity,
     select: (data): FormattedCategory[] => {
       const list = data.map((category) => ({
         value: category.id,

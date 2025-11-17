@@ -19,6 +19,7 @@ export const useQueryMonths = () => {
       const resp: Array<RawMonth> = await useMonth();
       return resp;
     },
+    staleTime: Infinity,
     select: (data): Array<FormattedMonth> => {
       const list = data.map((month) => ({
         value: String(month.id),

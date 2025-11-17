@@ -19,6 +19,7 @@ export const useQueryYears = () => {
       const resp: Array<RawYears> = await useYear();
       return resp;
     },
+    staleTime: Infinity,
     select: (data): Array<FormattedYear> => {
       const list = data.map((year) => ({
         value: String(year.id),

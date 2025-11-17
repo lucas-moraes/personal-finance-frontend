@@ -43,6 +43,7 @@ export const useQueryMovements = ({ month, category, year }: { month?: string; c
     queryFn: async () => {
       return await useFilterMovement({ month: safeMonth!, year: safeYear!, category: safeCategory! });
     },
+    staleTime: Infinity,
   });
 };
 
