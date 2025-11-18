@@ -60,7 +60,7 @@ export const CardGroups = () => {
   return (
     <div className="w-full mt-4 mb-4">
       <div className="max-h-[500px] overflow-y-auto custom-scrollbar mt-4">
-        <Button className="mb-4" onClick={SyncMovements} disabled={movement.length === 0 || createMovement.isPending}>
+        <Button variant="outline" className="mb-4" onClick={SyncMovements} disabled={movement.length === 0 || createMovement.isPending}>
           {createMovement.isPending ? "Syncing..." : "Sync Movements"}
         </Button>
         <Table>
@@ -84,7 +84,9 @@ export const CardGroups = () => {
                     (Number(invoice.valor) < 0 ? " text-pink-400" : " text-indigo-400")
                   }
                 >
-                  <TableCell className="w-[50px] font-medium">{`${invoice.dia}/${invoice.mes}/${invoice.ano}`}</TableCell>
+                  <TableCell className="w-[50px] font-medium">
+                    {`${invoice.dia}/${invoice.mes}/${invoice.ano}`}
+                  </TableCell>
                   <TableCell>
                     {categories.data?.find((_c) => _c.value === String(invoice.categoria))?.label || "Uncategorized"}
                   </TableCell>
