@@ -7,14 +7,13 @@ import { Input } from "@/components/ui/input";
 import type React from "react";
 import { useUpdateMovement, type TMovementById } from "@/tanstack-queries/movements";
 import { useEffect, useState } from "react";
-import { FormatNumberToCurrency } from "@/lib/utils";
 import { InputSelect } from "@/components/team/input-select";
 
 type TData = {
   date: Date | undefined;
   category: number;
   kind: string;
-  amount: number;
+  amount: string;
   description: string;
 };
 
@@ -27,7 +26,7 @@ export const CardEditInvoice: React.FC<{
     date: undefined,
     category: 0,
     kind: "",
-    amount: 0,
+    amount: "",
     description: "",
   });
   const updateMovement = useUpdateMovement();
@@ -36,6 +35,7 @@ export const CardEditInvoice: React.FC<{
     const dia = data.date?.getDate();
     const mes = data.date?.getMonth()! + 1;
     const ano = data.date?.getFullYear();
+    const amountCleaned = Number(data.amount.replace(".", "").replace(",", ".")) ;
 
     const formData = {
       dia: dia!,
@@ -44,7 +44,7 @@ export const CardEditInvoice: React.FC<{
       tipo: data.kind,
       categoria: data.category,
       descricao: data.description,
-      valor: data.amount,
+      valor: data.kind === "saida" ? amountCleaned * -1 : amountCleaned,
     };
 
     await updateMovement.mutateAsync({
@@ -61,7 +61,7 @@ export const CardEditInvoice: React.FC<{
       date,
       category: item.data[0].categoria,
       kind: item.data[0].tipo,
-      amount: item.data[0].valor,
+      amount: String(item.data[0].valor < 0 ? item.data[0].valor * -1 : item.data[0].valor),
       description: item.data[0].descricao,
     });
   }, [item]);
@@ -122,8 +122,15 @@ export const CardEditInvoice: React.FC<{
               <InputGroupInput
                 className="pb-1"
                 placeholder="0.00"
-                value={FormatNumberToCurrency(data.amount).replace("R$", "").trim()}
-                onChange={(e) => setData((prev) => ({ ...prev, amount: Number(e.target.value) || 0 }))}
+                value={data.amount.replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+                onChange={(e) => {
+                  let value = e.target.value.replace(/\D/g, "");
+                  value = (Number(value) / 100)
+                    .toFixed(2)
+                    .replace(".", ",")
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                  setData((prev) => ({ ...prev, amount: value }));
+                }}
               />
             </InputGroup>
           </Field>

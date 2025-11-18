@@ -159,7 +159,9 @@ export const CardInvoicesList = () => {
                     <TableCell>{invoice.categoriaDescricao}</TableCell>
                     <TableCell className="capitalize">{invoice.tipo}</TableCell>
                     <TableCell className="whitespace-normal">{invoice.descricao}</TableCell>
-                    <TableCell className="text-right">{FormatNumberToCurrency(Number(invoice.valor))}</TableCell>
+                    <TableCell className="text-right">
+                      {FormatNumberToCurrency(Number(invoice.valor < 0 ? invoice.valor * -1 : invoice.valor))}
+                    </TableCell>
                   </TableRow>
                   {editItem === Number(invoice.id) && Array.isArray(dataToEdit?.data) && (
                     <TableRow className="bg-violet-600/10 hover:bg-violet-600/10 border-b border-white/20 ">
