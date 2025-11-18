@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { FormatNumberToCurrency } from "@/lib/utils";
@@ -87,7 +88,17 @@ export const CardGroups = () => {
                   <TableCell>
                     {categories.data?.find((_c) => _c.value === String(invoice.categoria))?.label || "Uncategorized"}
                   </TableCell>
-                  <TableCell className="capitalize">{invoice.tipo}</TableCell>
+                  <TableCell className="capitalize">
+                    {invoice.tipo === "entrada" ? (
+                      <Badge variant="secondary" className="bg-blue-500 text-white dark:bg-blue-600">
+                        {invoice.tipo}
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary" className="bg-pink-500 text-white dark:bg-pink-600">
+                        {invoice.tipo}
+                      </Badge>
+                    )}
+                  </TableCell>
                   <TableCell className="text-right">{FormatNumberToCurrency(Number(invoice.valor))}</TableCell>
                   <TableCell className="w-[50px] flex justify-center">
                     <Button

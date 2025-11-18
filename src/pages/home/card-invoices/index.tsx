@@ -10,6 +10,7 @@ import { useQueryYears } from "@/tanstack-queries/years";
 import { EllipsisVertical, X } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { CardEditInvoice } from "./card-edit-invoices";
+import { Badge } from "@/components/ui/badge";
 
 export const CardInvoicesList = () => {
   const [editItem, setEditItem] = useState<number | null>(null);
@@ -155,9 +156,23 @@ export const CardInvoicesList = () => {
                         />
                       )}
                     </TableCell>
-                    <TableCell className="w-[50px] font-medium">{`${invoice.dia}/${invoice.mes}/${invoice.ano}`}</TableCell>
+                    <TableCell className="w-[50px] font-medium">
+                      {`
+                       ${invoice.dia}/${invoice.mes}/${invoice.ano}
+                      `}
+                    </TableCell>
                     <TableCell>{invoice.categoriaDescricao}</TableCell>
-                    <TableCell className="capitalize">{invoice.tipo}</TableCell>
+                    <TableCell className="capitalize">
+                      {invoice.tipo === "entrada" ? (
+                        <Badge variant="secondary" className="bg-blue-500 text-white dark:bg-blue-600">
+                          {invoice.tipo}
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="bg-pink-500 text-white dark:bg-pink-600">
+                          {invoice.tipo}
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell className="whitespace-normal">{invoice.descricao}</TableCell>
                     <TableCell className="text-right">
                       {FormatNumberToCurrency(Number(invoice.valor < 0 ? invoice.valor * -1 : invoice.valor))}
