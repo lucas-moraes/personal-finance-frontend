@@ -8,6 +8,7 @@ import type React from "react";
 import { useUpdateMovement, type TMovementById } from "@/tanstack-queries/movements";
 import { useEffect, useState } from "react";
 import { InputSelect } from "@/components/team/input-select";
+import { formatBRLInput, parseBRLInput } from "@/lib/utils";
 
 type TData = {
   date: Date | undefined;
@@ -35,7 +36,7 @@ export const CardEditInvoice: React.FC<{
     const dia = data.date?.getDate();
     const mes = data.date?.getMonth()! + 1;
     const ano = data.date?.getFullYear();
-    const amountCleaned = Number(data.amount.replace(".", "").replace(",", ".")) ;
+    const amountCleaned = parseBRLInput(data.amount);
 
     const formData = {
       dia: dia!,
@@ -57,11 +58,15 @@ export const CardEditInvoice: React.FC<{
     if (item.data.length === 0) return;
     const { dia, mes, ano } = item.data[0];
     const date = new Date(ano, mes - 1, dia);
+    const absoluteValue = item.data[0].valor < 0 ? item.data[0].valor * -1 : item.data[0].valor;
     setData({
       date,
       category: item.data[0].categoria,
       kind: item.data[0].tipo,
-      amount: String(item.data[0].valor < 0 ? item.data[0].valor * -1 : item.data[0].valor),
+      amount: absoluteValue.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
       description: item.data[0].descricao,
     });
   }, [item]);
@@ -121,15 +126,11 @@ export const CardEditInvoice: React.FC<{
               </InputGroupAddon>
               <InputGroupInput
                 className="pb-1"
-                placeholder="0.00"
-                value={data.amount.replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".")}
+                placeholder="0,00"
+                value={data.amount}
                 onChange={(e) => {
-                  let value = e.target.value.replace(/\D/g, "");
-                  value = (Number(value) / 100)
-                    .toFixed(2)
-                    .replace(".", ",")
-                    .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-                  setData((prev) => ({ ...prev, amount: value }));
+                  const formatted = formatBRLInput(e.target.value);
+                  setData((prev) => ({ ...prev, amount: formatted }));
                 }}
               />
             </InputGroup>
