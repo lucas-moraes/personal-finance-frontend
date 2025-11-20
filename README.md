@@ -7,6 +7,37 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
+## Project Structure
+
+```
+personal-finance-frontend/
+├── __tests__/          # Test files (separate from source code)
+├── src/                # Application source code
+├── public/             # Static assets
+├── dist/               # Build output
+└── ...
+```
+
+### Test Organization
+
+All test files are stored in the `__tests__` directory at the project root, providing clear separation between source code and tests. This structure:
+
+- Improves code organization
+- Makes tests easier to discover and maintain
+- Keeps application logic separate from test logic
+
+See [`__tests__/README.md`](./__tests__/README.md) for more details on testing.
+
+## Available Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build
+- `npm test` - Run tests in watch mode
+- `npm run test:run` - Run tests once
+- `npm run test:ui` - Run tests with UI
+
 ## React Compiler
 
 The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
