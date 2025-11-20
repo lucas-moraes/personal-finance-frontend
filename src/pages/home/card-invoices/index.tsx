@@ -11,6 +11,7 @@ import { EllipsisVertical, X } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { CardEditInvoice } from "./card-edit-invoices";
 import { Badge } from "@/components/ui/badge";
+import { TableSkeleton } from "@/components/ui/table-skeleton";
 
 export const CardInvoicesList = () => {
   const [editItem, setEditItem] = useState<number | null>(null);
@@ -26,7 +27,7 @@ export const CardInvoicesList = () => {
   const months = useQueryMonths();
   const years = useQueryYears();
   const deleteMovement = useDeleteMovement();
-  const { data } = useQueryMovements({
+  const { data, isLoading } = useQueryMovements({
     month: filterData.month,
     year: filterData.year,
     category: filterData.category,
@@ -107,19 +108,22 @@ export const CardInvoicesList = () => {
       </div>
 
       <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
-        <Table>
-          <TableHeader className="w-full text-white">
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="w-[50px] text-white"></TableHead>
-              <TableHead className="w-[50px] text-white">Date</TableHead>
-              <TableHead className="text-white">Category</TableHead>
-              <TableHead className="text-white">Kind</TableHead>
-              <TableHead className="text-white">Description</TableHead>
-              <TableHead className="text-right text-white">Amount</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data?.movements.map((invoice) => {
+        {isLoading ? (
+          <TableSkeleton columns={6} rows={8} />
+        ) : (
+          <Table>
+            <TableHeader className="w-full text-white">
+              <TableRow className="hover:bg-transparent">
+                <TableHead className="w-[50px] text-white"></TableHead>
+                <TableHead className="w-[50px] text-white">Date</TableHead>
+                <TableHead className="text-white">Category</TableHead>
+                <TableHead className="text-white">Kind</TableHead>
+                <TableHead className="text-white">Description</TableHead>
+                <TableHead className="text-right text-white">Amount</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data?.movements.map((invoice) => {
               if ("total" in invoice) return null;
 
               return (
@@ -193,22 +197,25 @@ export const CardInvoicesList = () => {
                   )}
                 </>
               );
-            })}
-          </TableBody>
-        </Table>
+              })}
+            </TableBody>
+          </Table>
+        )}
       </div>
-      <div className="max-h-[500px]">
-        <Table>
-          <TableFooter>
-            <TableRow className={Number(data?.total) < 0 ? " text-pink-400" : " text-indigo-400"}>
-              <TableCell colSpan={5}>Total</TableCell>
-              <TableCell className={"text-right" + (Number(data?.total) < 0 ? " text-pink-400" : " text-indigo-400")}>
-                {FormatNumberToCurrency(Number(data?.total))}
-              </TableCell>
-            </TableRow>
-          </TableFooter>
-        </Table>
-      </div>
+      {!isLoading && (
+        <div className="max-h-[500px]">
+          <Table>
+            <TableFooter>
+              <TableRow className={Number(data?.total) < 0 ? " text-pink-400" : " text-indigo-400"}>
+                <TableCell colSpan={5}>Total</TableCell>
+                <TableCell className={"text-right" + (Number(data?.total) < 0 ? " text-pink-400" : " text-indigo-400")}>
+                  {FormatNumberToCurrency(Number(data?.total))}
+                </TableCell>
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </div>
+      )}
     </>
   );
 };
