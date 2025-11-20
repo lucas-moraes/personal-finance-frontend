@@ -27,14 +27,16 @@ export const CardGroups = () => {
 
   function SyncMovements() {
     for (const _m of movement || []) {
-      createMovement.mutate({
-        ano: _m.ano,
-        categoria: _m.categoria,
-        descricao: "",
-        dia: _m.dia,
-        mes: _m.mes,
-        tipo: _m.tipo,
-        valor: _m.valor,
+      createMovement.mutateAsync({
+        data: {
+          dia: _m.dia,
+          mes: _m.mes,
+          ano: _m.ano,
+          tipo: _m.tipo,
+          categoria: _m.categoria,
+          descricao: "",
+          valor: _m.valor,
+        },
       });
     }
   }
