@@ -1,5 +1,6 @@
 import type React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Spinner } from "../ui/spinner";
 
 export const InputSelect: React.FC<{
   className?: string;
@@ -7,11 +8,19 @@ export const InputSelect: React.FC<{
   value?: string;
   options: Array<{ value: string; label: string }>;
   onSelect: (opt: string) => void;
-}> = ({ className, placeholder, options, value, onSelect }) => {
+  isLoading?: boolean;
+}> = ({ className, placeholder, options, value, onSelect, isLoading = false }) => {
   return (
-    <Select value={value} onValueChange={onSelect}>
+    <Select value={value} onValueChange={onSelect} disabled={isLoading}>
       <SelectTrigger className={className}>
-        <SelectValue placeholder={placeholder} />
+        {isLoading ? (
+          <div className="flex items-center gap-2">
+            <Spinner className="size-4" />
+            <span className="text-muted-foreground">Loading...</span>
+          </div>
+        ) : (
+          <SelectValue placeholder={placeholder} />
+        )}
       </SelectTrigger>
       <SelectContent>
         {options.length > 0 &&

@@ -77,6 +77,7 @@ export const CardInvoicesList = () => {
             onSelect={(value: string) => {
               CheckFilters({ origin: "category", value });
             }}
+            isLoading={categories.isLoading}
           />
           <InputSelect
             className="w-[120px] cursor-pointer"
@@ -86,6 +87,7 @@ export const CardInvoicesList = () => {
             onSelect={(value: string) => {
               CheckFilters({ origin: "month", value });
             }}
+            isLoading={months.isLoading}
           />
           <InputSelect
             className="w-[120px] cursor-pointer"
@@ -95,6 +97,7 @@ export const CardInvoicesList = () => {
             onSelect={(value: string) => {
               CheckFilters({ origin: "year", value });
             }}
+            isLoading={years.isLoading}
           />
           {filterData.isChanged && (
             <X
