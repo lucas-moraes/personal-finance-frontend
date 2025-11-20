@@ -12,6 +12,7 @@ import { useEffect, useId, useState } from "react";
 import { CardEditInvoice } from "./card-edit-invoices";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/table-skeleton";
+import { CardCreateInvoices } from "./card-create-invoices";
 
 export const CardInvoicesList = () => {
   const [editItem, setEditItem] = useState<number | null>(null);
@@ -67,7 +68,7 @@ export const CardInvoicesList = () => {
 
   return (
     <>
-      <div className="flex flex-col content-center items-start mt-4 mb-4">
+      <div className="flex flex-row content-center items-center justify-between mt-4 mb-4">
         <div className="flex flex-row gap-4">
           <InputSelect
             className="cursor-pointer"
@@ -108,6 +109,7 @@ export const CardInvoicesList = () => {
             />
           )}
         </div>
+        <CardCreateInvoices  listCategories={categories.data!}/>
       </div>
 
       <div className="max-h-[500px] overflow-y-auto custom-scrollbar">

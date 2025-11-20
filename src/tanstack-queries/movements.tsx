@@ -133,7 +133,7 @@ export const useCreateMovement = () => {
 
   return useMutation({
     mutationKey: ["create-movement"],
-    mutationFn: async (data: Omit<TMovementById, "id">) => {
+    mutationFn: async ({ data }: { data: Omit<TMovementById, "id"> }) => {
       return await useCreateMovement(data);
     },
     onSuccess: async () => {
@@ -145,4 +145,4 @@ export const useCreateMovement = () => {
       console.error("Error creating movement:", error);
     },
   });
-}
+};
