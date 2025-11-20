@@ -80,7 +80,7 @@ export const CardInvoicesList = () => {
             isLoading={categories.isLoading}
           />
           <InputSelect
-            className="w-[120px] cursor-pointer"
+            className="w-auto cursor-pointer"
             placeholder="Month"
             options={months.data ?? [{ value: "teste", label: "teste" }]}
             value={filterData.month}
@@ -90,7 +90,7 @@ export const CardInvoicesList = () => {
             isLoading={months.isLoading}
           />
           <InputSelect
-            className="w-[120px] cursor-pointer"
+            className="w-auto cursor-pointer"
             placeholder="Year"
             options={years.data ?? [{ value: "teste", label: "teste" }]}
             value={filterData.year}
