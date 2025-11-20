@@ -109,7 +109,9 @@ export const CardInvoicesList = () => {
             />
           )}
         </div>
-        <CardCreateInvoices  listCategories={categories.data!}/>
+        {!categories.isLoading && !months.isLoading && !years.isLoading && (
+          <CardCreateInvoices listCategories={categories.data!} />
+        )}
       </div>
 
       <div className="max-h-[500px] overflow-y-auto custom-scrollbar">
@@ -129,79 +131,79 @@ export const CardInvoicesList = () => {
             </TableHeader>
             <TableBody>
               {data?.movements.map((invoice) => {
-              if ("total" in invoice) return null;
+                if ("total" in invoice) return null;
 
-              return (
-                <>
-                  <TableRow
-                    key={id}
-                    className={
-                      "hover:bg-violet-600/20 border-b border-white/10" +
-                      (Number(invoice.valor) < 0 ? " text-pink-400" : " text-indigo-400")
-                    }
-                  >
-                    <TableCell className="w-[50px] font-medium gap-2">
-                      {showLineOptions !== Number(invoice.id) && (
-                        <Button
-                          variant="ghost"
-                          className="p-0 m-0 text-white cursor-pointer hover:bg-white/10"
-                          onClick={() => setShowLineOptions(Number(invoice.id))}
-                        >
-                          <EllipsisVertical size={16} />
-                        </Button>
-                      )}
-                      {showLineOptions === Number(invoice.id) && (
-                        <TableRowButtonOptions
-                          onClose={() => {
-                            setShowLineOptions(null);
-                            setEditItem(null);
-                          }}
-                          onEditItem={() => {
-                            setEditItem(Number(invoice.id));
-                          }}
-                          onDeleteItem={() => {
-                            DeleteMovement({ id: invoice.id });
-                          }}
-                        />
-                      )}
-                    </TableCell>
-                    <TableCell className="w-[50px] font-medium">
-                      {`
+                return (
+                  <>
+                    <TableRow
+                      key={id}
+                      className={
+                        "hover:bg-violet-600/20 border-b border-white/10" +
+                        (Number(invoice.valor) < 0 ? " text-pink-400" : " text-indigo-400")
+                      }
+                    >
+                      <TableCell className="w-[50px] font-medium gap-2">
+                        {showLineOptions !== Number(invoice.id) && (
+                          <Button
+                            variant="ghost"
+                            className="p-0 m-0 text-white cursor-pointer hover:bg-white/10"
+                            onClick={() => setShowLineOptions(Number(invoice.id))}
+                          >
+                            <EllipsisVertical size={16} />
+                          </Button>
+                        )}
+                        {showLineOptions === Number(invoice.id) && (
+                          <TableRowButtonOptions
+                            onClose={() => {
+                              setShowLineOptions(null);
+                              setEditItem(null);
+                            }}
+                            onEditItem={() => {
+                              setEditItem(Number(invoice.id));
+                            }}
+                            onDeleteItem={() => {
+                              DeleteMovement({ id: invoice.id });
+                            }}
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell className="w-[50px] font-medium">
+                        {`
                        ${invoice.dia}/${invoice.mes}/${invoice.ano}
                       `}
-                    </TableCell>
-                    <TableCell>{invoice.categoriaDescricao}</TableCell>
-                    <TableCell className="capitalize">
-                      {invoice.tipo === "entrada" ? (
-                        <Badge variant="secondary" className="bg-blue-500 text-white dark:bg-blue-600">
-                          {invoice.tipo}
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="bg-pink-500 text-white dark:bg-pink-600">
-                          {invoice.tipo}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="whitespace-normal">{invoice.descricao}</TableCell>
-                    <TableCell className="text-right">
-                      {FormatNumberToCurrency(Number(invoice.valor < 0 ? invoice.valor * -1 : invoice.valor))}
-                    </TableCell>
-                  </TableRow>
-                  {editItem === Number(invoice.id) && Array.isArray(dataToEdit?.data) && (
-                    <TableRow className="bg-violet-600/10 hover:bg-violet-600/10 border-b border-white/20 ">
-                      <TableCell colSpan={6} className="p-4">
-                        <CardEditInvoice
-                          item={{ id: editItem.toString(), data: dataToEdit?.data! }}
-                          listCategories={categories.data!}
-                          onClose={() => {
-                            setEditItem(null);
-                          }}
-                        />
+                      </TableCell>
+                      <TableCell>{invoice.categoriaDescricao}</TableCell>
+                      <TableCell className="capitalize">
+                        {invoice.tipo === "entrada" ? (
+                          <Badge variant="secondary" className="bg-blue-500 text-white dark:bg-blue-600">
+                            {invoice.tipo}
+                          </Badge>
+                        ) : (
+                          <Badge variant="secondary" className="bg-pink-500 text-white dark:bg-pink-600">
+                            {invoice.tipo}
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="whitespace-normal">{invoice.descricao}</TableCell>
+                      <TableCell className="text-right">
+                        {FormatNumberToCurrency(Number(invoice.valor < 0 ? invoice.valor * -1 : invoice.valor))}
                       </TableCell>
                     </TableRow>
-                  )}
-                </>
-              );
+                    {editItem === Number(invoice.id) && Array.isArray(dataToEdit?.data) && (
+                      <TableRow className="bg-violet-600/10 hover:bg-violet-600/10 border-b border-white/20 ">
+                        <TableCell colSpan={6} className="p-4">
+                          <CardEditInvoice
+                            item={{ id: editItem.toString(), data: dataToEdit?.data! }}
+                            listCategories={categories.data!}
+                            onClose={() => {
+                              setEditItem(null);
+                            }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </>
+                );
               })}
             </TableBody>
           </Table>
