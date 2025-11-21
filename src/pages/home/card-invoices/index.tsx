@@ -13,6 +13,7 @@ import { CardEditInvoice } from "./card-edit-invoices";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { CardCreateInvoices } from "./card-create-invoices";
+import { Spinner } from "@/components/ui/spinner";
 
 export const CardInvoicesList = () => {
   const [editItem, setEditItem] = useState<number | null>(null);
@@ -33,7 +34,7 @@ export const CardInvoicesList = () => {
     year: filterData.year,
     category: filterData.category,
   });
-  const dataToEdit = useQueryFilterMovementById({ id: editItem! });
+  const { data: dataToEdit, isLoading: isLoadingEdit } = useQueryFilterMovementById({ id: editItem! });
 
   function InitialMovement() {
     const today = new Date();
@@ -195,16 +196,25 @@ export const CardInvoicesList = () => {
                         {FormatNumberToCurrency(Number(invoice.valor < 0 ? invoice.valor * -1 : invoice.valor))}
                       </TableCell>
                     </TableRow>
-                    {editItem === Number(invoice.id) && Array.isArray(dataToEdit?.data) && (
+                    {editItem === Number(invoice.id) && (
                       <TableRow className="bg-violet-600/10 hover:bg-violet-600/10 border-b border-white/20 ">
                         <TableCell colSpan={6} className="p-4">
-                          <CardEditInvoice
-                            item={{ id: editItem.toString(), data: dataToEdit?.data! }}
-                            listCategories={categories.data!}
-                            onClose={() => {
-                              setEditItem(null);
-                            }}
-                          />
+                          {isLoadingEdit ? (
+                            <div className="flex items-center justify-center py-8">
+                              <Spinner className="size-8 text-white" />
+                              <span className="ml-3 text-white">Loading invoice data...</span>
+                            </div>
+                          ) : (
+                            dataToEdit && (
+                              <CardEditInvoice
+                                item={{ id: editItem.toString(), data: [dataToEdit] }}
+                                listCategories={categories.data!}
+                                onClose={() => {
+                                  setEditItem(null);
+                                }}
+                              />
+                            )
+                          )}
                         </TableCell>
                       </TableRow>
                     )}
