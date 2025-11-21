@@ -1,4 +1,34 @@
-# React + TypeScript + Vite
+# Personal Finance Frontend
+
+A React + TypeScript + Vite application for personal finance management with Touch ID authentication support for macOS users.
+
+## Features
+
+- 💰 Personal finance tracking
+- 🔐 Traditional username/password authentication
+- 👆 Touch ID authentication for macOS users (NEW)
+- 📊 Financial metrics and reporting
+- 🎨 Modern UI with Tailwind CSS
+
+## Touch ID Authentication
+
+This application now supports Touch ID authentication for macOS users! When accessing the login page from a Mac with Touch ID, users can authenticate using their fingerprint instead of typing a password.
+
+### Documentation
+
+- **[Quick Start Guide](TOUCHID_QUICKSTART.md)** - Get started quickly
+- **[Implementation Details](TOUCHID_IMPLEMENTATION.md)** - Technical documentation
+- **[Architecture](ARCHITECTURE.md)** - System architecture and diagrams
+- **[Backend Requirements](BACKEND_REQUIREMENTS.md)** - Backend API specifications
+- **[Implementation Summary](IMPLEMENTATION_SUMMARY.md)** - Complete overview
+
+### Requirements
+
+- macOS with Touch ID hardware
+- Modern browser (Safari 14+, Chrome 70+, Firefox 60+, Edge 79+)
+- Backend API implementation (see [Backend Requirements](BACKEND_REQUIREMENTS.md))
+
+## Getting Started
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
