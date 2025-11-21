@@ -1,9 +1,19 @@
 /**
  * Detects if the user is accessing from a macOS device
+ * Uses multiple detection methods for better accuracy
  * @returns true if the platform is macOS, false otherwise
  */
 export function isMacOS(): boolean {
-  return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  // Check userAgent as navigator.platform is deprecated
+  const userAgent = navigator.userAgent.toLowerCase();
+  const isMac = userAgent.includes('mac') && !userAgent.includes('iphone') && !userAgent.includes('ipad');
+  
+  // Fallback to platform check for older browsers
+  if (!isMac && navigator.platform) {
+    return navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  }
+  
+  return isMac;
 }
 
 /**

@@ -194,12 +194,12 @@ export const LoginPage = () => {
                       Touch ID
                     </>
                   )}
-                  {isTouchIDAuthenticating && <Spinner/>}
+                  {isTouchIDAuthenticating && <Spinner />}
                 </Button>
               )}
               <Button type="submit" className="w-full" disabled={form.formState.isSubmitting || isTouchIDAuthenticating}>
                 {!form.formState.isSubmitting && 'Login'}
-                {form.formState.isSubmitting && <Spinner/>}
+                {form.formState.isSubmitting && <Spinner />}
               </Button>
             </CardFooter>
           </Card>

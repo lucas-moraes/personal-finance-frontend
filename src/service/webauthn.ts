@@ -86,9 +86,15 @@ export async function registerCredential(
     const response = credential.response as AuthenticatorAttestationResponse;
     const publicKey = response.getPublicKey();
     
+    // Public key is required for registration
+    if (!publicKey) {
+      console.error('Public key not available from authenticator response');
+      return null;
+    }
+    
     return {
       credentialId: bufferToBase64url(credential.rawId),
-      publicKey: bufferToBase64url(publicKey || new ArrayBuffer(0)),
+      publicKey: bufferToBase64url(publicKey),
     };
   } catch (error) {
     console.error('Error registering credential:', error);
@@ -155,8 +161,13 @@ export function hasStoredCredential(username: string): boolean {
 
 /**
  * Stores the credential ID for a username
+ * Note: Uses localStorage for simplicity. Consider sessionStorage or IndexedDB with encryption for production.
  */
 export function storeCredential(username: string, credentialId: string): void {
+  if (!username || !credentialId) {
+    console.warn('Username and credentialId are required to store credential');
+    return;
+  }
   localStorage.setItem(`webauthn_credential_${username}`, credentialId);
 }
 
@@ -164,6 +175,9 @@ export function storeCredential(username: string, credentialId: string): void {
  * Retrieves the stored credential ID for a username
  */
 export function getStoredCredential(username: string): string | null {
+  if (!username) {
+    return null;
+  }
   return localStorage.getItem(`webauthn_credential_${username}`);
 }
 
@@ -171,5 +185,8 @@ export function getStoredCredential(username: string): string | null {
  * Removes the stored credential for a username
  */
 export function removeStoredCredential(username: string): void {
+  if (!username) {
+    return;
+  }
   localStorage.removeItem(`webauthn_credential_${username}`);
 }
