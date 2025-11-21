@@ -204,17 +204,18 @@ export const CardInvoicesList = () => {
                               <Spinner className="size-8 text-white" />
                               <span className="ml-3 text-white">Loading invoice data...</span>
                             </div>
-                          ) : (
-                            Array.isArray(dataToEdit) && (
-                              <CardEditInvoice
-                                item={{ id: editItem.toString(), data: dataToEdit }}
-                                listCategories={categories.data!}
-                                onClose={() => {
-                                  setEditItem(null);
-                                }}
-                              />
-                            )
-                          )}
+                          ) : dataToEdit ? (
+                            <CardEditInvoice
+                              item={{ 
+                                id: editItem.toString(), 
+                                data: Array.isArray(dataToEdit) ? dataToEdit : [dataToEdit] 
+                              }}
+                              listCategories={categories.data!}
+                              onClose={() => {
+                                setEditItem(null);
+                              }}
+                            />
+                          ) : null}
                         </TableCell>
                       </TableRow>
                     )}
