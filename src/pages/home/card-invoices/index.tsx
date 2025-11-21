@@ -205,9 +205,9 @@ export const CardInvoicesList = () => {
                               <span className="ml-3 text-white">Loading invoice data...</span>
                             </div>
                           ) : (
-                            dataToEdit && (
+                            Array.isArray(dataToEdit) && (
                               <CardEditInvoice
-                                item={{ id: editItem.toString(), data: [dataToEdit] }}
+                                item={{ id: editItem.toString(), data: dataToEdit }}
                                 listCategories={categories.data!}
                                 onClose={() => {
                                   setEditItem(null);
