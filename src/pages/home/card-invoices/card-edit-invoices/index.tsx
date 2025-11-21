@@ -21,8 +21,9 @@ type TData = {
 export const CardEditInvoice: React.FC<{
   item: { id: string; data: TMovementById[] };
   listCategories: Array<{ value: string; label: string }>;
+  isLoadingCategories?: boolean;
   onClose: () => void;
-}> = ({ item, listCategories, onClose }) => {
+}> = ({ item, listCategories, isLoadingCategories = false, onClose }) => {
   const [data, setData] = useState<TData>({
     date: undefined,
     category: 0,
@@ -99,6 +100,7 @@ export const CardEditInvoice: React.FC<{
               onSelect={(value: string) => {
                 setData((prev) => ({ ...prev, category: Number(value) }));
               }}
+              isLoading={isLoadingCategories}
             />
           </Field>
           <Field>

@@ -211,6 +211,7 @@ export const CardInvoicesList = () => {
                                 data: Array.isArray(dataToEdit) ? dataToEdit : [dataToEdit] 
                               }}
                               listCategories={categories.data!}
+                              isLoadingCategories={categories.isLoading}
                               onClose={() => {
                                 setEditItem(null);
                               }}
