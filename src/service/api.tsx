@@ -54,6 +54,79 @@ export const useApi = () => {
     return true;
   };
 
+  const useTouchIDLogin = async ({ 
+    email, 
+    credentialId, 
+    signature, 
+    authenticatorData, 
+    clientDataJSON 
+  }: { 
+    email: string; 
+    credentialId: string; 
+    signature: string; 
+    authenticatorData: string; 
+    clientDataJSON: string;
+  }) => {
+    const resp = await ApiFetch({
+      endpoint: "/api/auth/login/touchid",
+      options: {
+        method: "POST",
+        body: JSON.stringify({ 
+          email, 
+          credentialId, 
+          signature, 
+          authenticatorData, 
+          clientDataJSON 
+        }),
+      },
+    }).then((res) => res.json()).catch(() => null);
+
+    if (!resp || !resp.token) {
+      return false;
+    }
+
+    localStorage.setItem("authToken", resp.token);
+
+    return true;
+  };
+
+  const useRegisterTouchID = async ({ 
+    email, 
+    credentialId, 
+    publicKey 
+  }: { 
+    email: string; 
+    credentialId: string; 
+    publicKey: string;
+  }) => {
+    if (!token) {
+      return false;
+    }
+
+    const resp = await ApiFetch({
+      endpoint: "/api/auth/register-touchid",
+      options: {
+        method: "POST",
+        body: JSON.stringify({ email, credentialId, publicKey }),
+      },
+      token,
+    }).then((res) => res.json()).catch(() => null);
+
+    return resp && resp.success;
+  };
+
+  const useGetTouchIDChallenge = async ({ email }: { email: string }) => {
+    const resp = await ApiFetch({
+      endpoint: "/api/auth/touchid-challenge",
+      options: {
+        method: "POST",
+        body: JSON.stringify({ email }),
+      },
+    }).then((res) => res.json()).catch(() => null);
+
+    return resp && resp.challenge ? resp.challenge : null;
+  };
+
   const useToken = async () => {
     if (!token) {
       return navigate({ to: "/login" });
@@ -235,6 +308,9 @@ export const useApi = () => {
 
   return {
     useLogin,
+    useTouchIDLogin,
+    useRegisterTouchID,
+    useGetTouchIDChallenge,
     useToken,
     useHealth,
     useFilterMovement,
