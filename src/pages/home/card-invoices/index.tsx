@@ -63,6 +63,11 @@ export const CardInvoicesList = () => {
   }
 
   useEffect(() => {
+    const itemToEdit = document.getElementById(`invoice-row-${showLineOptions}`);
+    itemToEdit?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [showLineOptions]);
+
+  useEffect(() => {
     InitialMovement();
   }, []);
 
@@ -137,6 +142,7 @@ export const CardInvoicesList = () => {
                   <>
                     <TableRow
                       key={id}
+                      id={`invoice-row-${invoice.id}`}
                       className={
                         "hover:bg-violet-600/20 border-b border-white/10" +
                         (Number(invoice.valor) < 0 ? " text-pink-400" : " text-indigo-400")
