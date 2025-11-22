@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, Table
 import { FormatNumberToCurrency } from "@/lib/utils";
 import { useQueryCategories } from "@/tanstack-queries/categories";
 import { useQueryMonths } from "@/tanstack-queries/months";
-import { useDeleteMovement, useQueryFilterMovementById, useQueryMovements } from "@/tanstack-queries/movements";
+import { useDeleteMovement, useQueryFilterMovementById, useQueryMovements, type TMovementById } from "@/tanstack-queries/movements";
 import { useQueryYears } from "@/tanstack-queries/years";
 import { EllipsisVertical, X } from "lucide-react";
 import { useEffect, useId, useState } from "react";
@@ -33,7 +33,7 @@ export const CardInvoicesList = () => {
     year: filterData.year,
     category: filterData.category,
   });
-  const dataToEdit = useQueryFilterMovementById({ id: editItem! });
+  const { data: dataToEdit, isLoading: isLoadingEdit } = useQueryFilterMovementById({ id: editItem! });
 
   function InitialMovement() {
     const today = new Date();
@@ -195,16 +195,21 @@ export const CardInvoicesList = () => {
                         {FormatNumberToCurrency(Number(invoice.valor < 0 ? invoice.valor * -1 : invoice.valor))}
                       </TableCell>
                     </TableRow>
-                    {editItem === Number(invoice.id) && Array.isArray(dataToEdit?.data) && (
+                    {editItem === Number(invoice.id) && (
                       <TableRow className="bg-violet-600/10 hover:bg-violet-600/10 border-b border-white/20 ">
                         <TableCell colSpan={6} className="p-4">
-                          <CardEditInvoice
-                            item={{ id: editItem.toString(), data: dataToEdit?.data! }}
-                            listCategories={categories.data!}
-                            onClose={() => {
-                              setEditItem(null);
-                            }}
-                          />
+                            <CardEditInvoice
+                              item={{ 
+                                id: editItem.toString(), 
+                                data: (dataToEdit ?? []) as TMovementById[],
+                                isLoading: isLoadingEdit
+                              }}
+                              listCategories={categories.data!}
+                              isLoadingCategories={categories.isLoading}
+                              onClose={() => {
+                                setEditItem(null);
+                              }}
+                            />
                         </TableCell>
                       </TableRow>
                     )}

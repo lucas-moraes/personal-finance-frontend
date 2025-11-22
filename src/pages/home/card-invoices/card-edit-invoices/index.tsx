@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Datepicker } from "@/components/ui/datepicker";
 import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
-import { Save, X } from "lucide-react";
-import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@/components/ui/input-group";
+import {  Save, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import type React from "react";
 import { useUpdateMovement, type TMovementById } from "@/tanstack-queries/movements";
 import { useEffect, useState } from "react";
 import { InputSelect } from "@/components/team/input-select";
 import { formatBRLInput, parseBRLInput } from "@/lib/utils";
+import { InputCurrency } from "@/components/team/home/input-currency";
 
 type TData = {
   date: Date | undefined;
@@ -19,10 +19,11 @@ type TData = {
 };
 
 export const CardEditInvoice: React.FC<{
-  item: { id: string; data: TMovementById[] };
+  item: { id: string; data: TMovementById[]; isLoading: boolean };
   listCategories: Array<{ value: string; label: string }>;
+  isLoadingCategories?: boolean;
   onClose: () => void;
-}> = ({ item, listCategories, onClose }) => {
+}> = ({ item, listCategories, isLoadingCategories = false, onClose }) => {
   const [data, setData] = useState<TData>({
     date: undefined,
     category: 0,
@@ -69,10 +70,13 @@ export const CardEditInvoice: React.FC<{
       }),
       description: item.data[0].descricao,
     });
+
+    const container = document.getElementById(`edit-invoice-${item.id}`);
+    container?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [item]);
 
   return (
-    <FieldSet>
+    <FieldSet id={`edit-invoice-${item.id}`} className="w-full">
       <FieldLegend className="flex flex-row items-center w-full pb-4 border-b border-white/20 justify-between">
         Edit invoice
         <Button variant="ghost" className="p-0 m-0 cursor-pointer text-white hover:text-red-500" onClick={onClose}>
@@ -87,6 +91,7 @@ export const CardEditInvoice: React.FC<{
               onSelect={(date: Date | undefined) => {
                 setData((prev) => ({ ...prev, date: date }));
               }}
+              isLoading={item.isLoading}
             />
           </Field>
           <Field>
@@ -99,6 +104,7 @@ export const CardEditInvoice: React.FC<{
               onSelect={(value: string) => {
                 setData((prev) => ({ ...prev, category: Number(value) }));
               }}
+              isLoading={isLoadingCategories || item.isLoading}
             />
           </Field>
           <Field>
@@ -114,26 +120,20 @@ export const CardEditInvoice: React.FC<{
               onSelect={(value: string | undefined) => {
                 setData((prev) => ({ ...prev, kind: value || "" }));
               }}
+              isLoading={item.isLoading}
             />
           </Field>
         </div>
         <div className="grid grid-cols-[2fr_5fr_1fr] gap-4">
           <Field>
             <FieldLabel htmlFor="value">Amount</FieldLabel>
-            <InputGroup>
-              <InputGroupAddon>
-                <InputGroupText>R$</InputGroupText>
-              </InputGroupAddon>
-              <InputGroupInput
-                className="pb-1"
-                placeholder="0,00"
-                value={data.amount}
-                onChange={(e) => {
-                  const formatted = formatBRLInput(e.target.value);
-                  setData((prev) => ({ ...prev, amount: formatted }));
-                }}
-              />
-            </InputGroup>
+            <InputCurrency
+              currency="R$"
+              placeholder="0,00"
+              value={data.amount}
+              isLoading={item.isLoading}
+              onChange={(e) => setData((prev) => ({ ...prev, amount: formatBRLInput(e.value) }))}
+            />
           </Field>
           <Field>
             <FieldLabel htmlFor="description">Description</FieldLabel>
@@ -141,6 +141,7 @@ export const CardEditInvoice: React.FC<{
               id="description"
               autoComplete="off"
               value={data.description}
+              isLoading={item.isLoading}
               onChange={(e) => setData((prev) => ({ ...prev, description: e.target.value || "" }))}
             />
           </Field>
@@ -148,6 +149,7 @@ export const CardEditInvoice: React.FC<{
             <Button
               className="p-0 m-0 text-white cursor-pointer self-end"
               variant="outline"
+              disabled={item.isLoading}
               onClick={() => handleUpdateMovement({ id: item.id, data })}
             >
               <Save />
