@@ -13,7 +13,6 @@ import { CardEditInvoice } from "./card-edit-invoices";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { CardCreateInvoices } from "./card-create-invoices";
-import { Spinner } from "@/components/ui/spinner";
 
 export const CardInvoicesList = () => {
   const [editItem, setEditItem] = useState<number | null>(null);
