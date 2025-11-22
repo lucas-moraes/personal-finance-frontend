@@ -11,12 +11,12 @@ export const InputSelect: React.FC<{
   isLoading?: boolean;
 }> = ({ className, placeholder, options, value, onSelect, isLoading = false }) => {
   return (
-    <Select value={value} onValueChange={onSelect} disabled={isLoading}>
+    <Select value={value} onValueChange={onSelect}>
       <SelectTrigger className={className}>
         {isLoading ? (
           <div className="flex items-center gap-2">
-            <Spinner className="size-4" />
-            <span className="text-muted-foreground">Loading...</span>
+            <Spinner className="size-4 text-slate-400" />
+            <span className="text-slate-400">Loading...</span>
           </div>
         ) : (
           <SelectValue placeholder={placeholder} />

@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, Table
 import { FormatNumberToCurrency } from "@/lib/utils";
 import { useQueryCategories } from "@/tanstack-queries/categories";
 import { useQueryMonths } from "@/tanstack-queries/months";
-import { useDeleteMovement, useQueryFilterMovementById, useQueryMovements } from "@/tanstack-queries/movements";
+import { useDeleteMovement, useQueryFilterMovementById, useQueryMovements, type TMovementById } from "@/tanstack-queries/movements";
 import { useQueryYears } from "@/tanstack-queries/years";
 import { EllipsisVertical, X } from "lucide-react";
 import { useEffect, useId, useState } from "react";
@@ -199,16 +199,11 @@ export const CardInvoicesList = () => {
                     {editItem === Number(invoice.id) && (
                       <TableRow className="bg-violet-600/10 hover:bg-violet-600/10 border-b border-white/20 ">
                         <TableCell colSpan={6} className="p-4">
-                          {isLoadingEdit ? (
-                            <div className="flex items-center justify-center py-8">
-                              <Spinner className="size-8 text-white" />
-                              <span className="ml-3 text-white">Loading invoice data...</span>
-                            </div>
-                          ) : dataToEdit ? (
                             <CardEditInvoice
                               item={{ 
                                 id: editItem.toString(), 
-                                data: Array.isArray(dataToEdit) ? dataToEdit : [dataToEdit] 
+                                data: (dataToEdit ?? []) as TMovementById[],
+                                isLoading: isLoadingEdit
                               }}
                               listCategories={categories.data!}
                               isLoadingCategories={categories.isLoading}
@@ -216,7 +211,6 @@ export const CardInvoicesList = () => {
                                 setEditItem(null);
                               }}
                             />
-                          ) : null}
                         </TableCell>
                       </TableRow>
                     )}
