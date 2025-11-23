@@ -40,7 +40,7 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="fixed w-full h-full flex justify-center items-center bg-[url('/src/assets/login-background.webp')] bg-cover bg-center">
+    <div className="fixed w-full h-full flex justify-center items-center bg-cover bg-center">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Card className="w-[300px] bg-blue-500/10 backdrop-blur-sm border border-blue-500/20">
