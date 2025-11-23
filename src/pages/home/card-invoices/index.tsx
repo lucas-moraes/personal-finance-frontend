@@ -5,9 +5,14 @@ import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, Table
 import { FormatNumberToCurrency } from "@/lib/utils";
 import { useQueryCategories } from "@/tanstack-queries/categories";
 import { useQueryMonths } from "@/tanstack-queries/months";
-import { useDeleteMovement, useQueryFilterMovementById, useQueryMovements, type TMovementById } from "@/tanstack-queries/movements";
+import {
+  useDeleteMovement,
+  useQueryFilterMovementById,
+  useQueryMovements,
+  type TMovementById,
+} from "@/tanstack-queries/movements";
 import { useQueryYears } from "@/tanstack-queries/years";
-import { EllipsisVertical, X } from "lucide-react";
+import { Check, CircleAlert, CircleCheck, EllipsisVertical, X } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { CardEditInvoice } from "./card-edit-invoices";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +21,7 @@ import { CardCreateInvoices } from "./card-create-invoices";
 
 export const CardInvoicesList = () => {
   const [editItem, setEditItem] = useState<number | null>(null);
+  const [deleteItem, setDeleteItem] = useState<number | null>(null);
   const [showLineOptions, setShowLineOptions] = useState<number | null>(null);
   const [filterData, setFilterData] = useState<{
     category?: string;
@@ -145,7 +151,9 @@ export const CardInvoicesList = () => {
                       id={`invoice-row-${invoice.id}`}
                       className={
                         "hover:bg-violet-600/20 border-b border-white/10" +
-                        (Number(invoice.valor) < 0 ? " text-pink-400" : " text-indigo-400")
+                        (Number(invoice.valor) < 0 ? " text-pink-400" : " text-indigo-400") +
+                        (editItem === Number(invoice.id) && "dark: bg-green-900/30 hover:bg-green-900/30 opacity-50") +
+                        (deleteItem === Number(invoice.id) && "dark: bg-red-600/30 hover:bg-red-600/30 opacity-50")
                       }
                     >
                       <TableCell className="w-[50px] font-medium gap-2">
@@ -160,6 +168,7 @@ export const CardInvoicesList = () => {
                         )}
                         {showLineOptions === Number(invoice.id) && (
                           <TableRowButtonOptions
+                            disabled={editItem !== null || deleteItem !== null}
                             onClose={() => {
                               setShowLineOptions(null);
                               setEditItem(null);
@@ -168,7 +177,8 @@ export const CardInvoicesList = () => {
                               setEditItem(Number(invoice.id));
                             }}
                             onDeleteItem={() => {
-                              DeleteMovement({ id: invoice.id });
+                              //DeleteMovement({ id: invoice.id });
+                              setDeleteItem(Number(invoice.id));
                             }}
                           />
                         )}
@@ -195,21 +205,51 @@ export const CardInvoicesList = () => {
                         {FormatNumberToCurrency(Number(invoice.valor < 0 ? invoice.valor * -1 : invoice.valor))}
                       </TableCell>
                     </TableRow>
-                    {editItem === Number(invoice.id) && (
-                      <TableRow className="bg-violet-600/10 hover:bg-violet-600/10 border-b border-white/20 ">
+                    {deleteItem === Number(invoice.id) && (
+                      <TableRow className="bg-red-600/20 hover:bg-red-600/20 border-b border-white/20 ">
                         <TableCell colSpan={6} className="p-4">
-                            <CardEditInvoice
-                              item={{ 
-                                id: editItem.toString(), 
-                                data: (dataToEdit ?? []) as TMovementById[],
-                                isLoading: isLoadingEdit
-                              }}
-                              listCategories={categories.data!}
-                              isLoadingCategories={categories.isLoading}
-                              onClose={() => {
-                                setEditItem(null);
-                              }}
-                            />
+                          <div className="flex flex-row items-center justify-center gap-4">
+                            <CircleAlert />
+                            <p>Are you sure you want to delete this movement?</p>
+                            <div className="flex flex-row gap-4">
+                              <Button
+                                size="icon"
+                                className="w-[50px] bg-transparent cursor-pointer text-white border border-red-500 hover:bg-red-600 hover:border-red-600"
+                                onClick={() => {
+                                  DeleteMovement({ id: invoice.id });
+                                  setDeleteItem(null);
+                                }}
+                              >
+                                <Check />
+                              </Button>
+                              <Button
+                                className="w-[50px] bg-transparent cursor-pointer text-white border border-green-400 hover:text-green-800 hover:bg-green-400 hover:border-green-400"
+                                onClick={() => {
+                                  setDeleteItem(null);
+                                }}
+                              >
+                                <X />
+                              </Button>
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                    {editItem === Number(invoice.id) && (
+                      <TableRow className="bg-green-600/10 hover:bg-gree-600/10 border-b border-white/20 ">
+                        <TableCell colSpan={6} className="p-4">
+                          <CardEditInvoice
+                            item={{
+                              id: editItem.toString(),
+                              data: (dataToEdit ?? []) as TMovementById[],
+                              isLoading: isLoadingEdit,
+                            }}
+                            listCategories={categories.data!}
+                            isLoadingCategories={categories.isLoading}
+                            onClose={() => {
+                              setEditItem(null);
+                            }}
+                          />
                         </TableCell>
                       </TableRow>
                     )}
