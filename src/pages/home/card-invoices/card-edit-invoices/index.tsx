@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Datepicker } from "@/components/ui/datepicker";
 import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@/components/ui/field";
-import {  Save, X } from "lucide-react";
+import { Save, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import type React from "react";
 import { useUpdateMovement, type TMovementById } from "@/tanstack-queries/movements";
@@ -70,10 +70,12 @@ export const CardEditInvoice: React.FC<{
       }),
       description: item.data[0].descricao,
     });
-
-    const container = document.getElementById(`edit-invoice-${item.id}`);
-    container?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [item]);
+
+  useEffect(() => {
+    const container = document.getElementById(`edit-invoice-${item.id}`);
+    container?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, []);
 
   return (
     <FieldSet id={`edit-invoice-${item.id}`} className="w-full">
