@@ -10,7 +10,7 @@ import { CardGroups } from "./card-groups";
 export const HomePage = () => {
   return (
     <GlassCard shadowMode={true} cornerRadius={16} blurAmount={0.01}>
-      <Card className="w-[800px] p-5 bg-slate-950/50 text-white shadow-none border border-purple-400/10">
+      <Card id="home" className="w-[800px] p-5 bg-slate-950/50 text-white shadow-none border border-purple-400/10">
         <CardContent>
           <div className="flex w-full flex-col gap-6">
             <Tabs defaultValue="invoices">

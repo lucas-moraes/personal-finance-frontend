@@ -9,7 +9,7 @@ function AppLayout() {
   return (
     <div className="relative flex flex-row min-h-screen">
       <Navbar />
-      <main className="m-10">
+      <main className="m-10 justify-center flex flex-1">
         <Outlet />
       </main>
     </div>
