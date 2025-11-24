@@ -12,7 +12,7 @@ import {
   type TMovementById,
 } from "@/tanstack-queries/movements";
 import { useQueryYears } from "@/tanstack-queries/years";
-import { Check, CircleAlert, CircleCheck, EllipsisVertical, X } from "lucide-react";
+import { Check, CircleAlert, EllipsisVertical, X } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { CardEditInvoice } from "./card-edit-invoices";
 import { Badge } from "@/components/ui/badge";
