@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import { InputSelect } from "@/components/team/input-select";
 import { formatBRLInput, parseBRLInput } from "@/lib/utils";
 import { InputCurrency } from "@/components/team/home/input-currency";
+import { useToast } from "@/components/ui/toast";
+import { Spinner } from "@/components/ui/spinner";
 
 type TData = {
   date: Date | undefined;
@@ -32,8 +34,46 @@ export const CardEditInvoice: React.FC<{
     description: "",
   });
   const updateMovement = useUpdateMovement();
+  const { addToast, removeToast } = useToast();
 
   async function handleUpdateMovement({ id, data }: { id: string; data: TData }) {
+    // Validação básica
+    if (!data.date) {
+      addToast({
+        type: "error",
+        title: "Erro ao salvar",
+        description: "Por favor, selecione uma data.",
+      });
+      return;
+    }
+
+    if (!data.category || data.category === 0) {
+      addToast({
+        type: "error",
+        title: "Erro ao salvar",
+        description: "Por favor, selecione uma categoria.",
+      });
+      return;
+    }
+
+    if (!data.kind) {
+      addToast({
+        type: "error",
+        title: "Erro ao salvar",
+        description: "Por favor, selecione o tipo (Entrada/Saída).",
+      });
+      return;
+    }
+
+    if (!data.amount || parseFloat(parseBRLInput(data.amount).toString()) <= 0) {
+      addToast({
+        type: "error",
+        title: "Erro ao salvar",
+        description: "Por favor, informe um valor válido.",
+      });
+      return;
+    }
+
     const dia = data.date?.getDate();
     const mes = data.date?.getMonth()! + 1;
     const ano = data.date?.getFullYear();
@@ -49,10 +89,42 @@ export const CardEditInvoice: React.FC<{
       valor: data.kind === "saida" ? amountCleaned * -1 : amountCleaned,
     };
 
-    await updateMovement.mutateAsync({
-      id: id,
-      data: formData,
+    // Mostra toast de loading
+    const loadingToastId = addToast({
+      type: "loading",
+      title: "Salvando...",
+      description: "Aguarde enquanto salvamos as alterações.",
     });
+
+    try {
+      await updateMovement.mutateAsync({
+        id: id,
+        data: formData,
+      });
+
+      // Remove toast de loading
+      removeToast(loadingToastId);
+
+      // Mostra toast de sucesso
+      addToast({
+        type: "success",
+        title: "Sucesso!",
+        description: "Invoice atualizado com sucesso.",
+      });
+
+      // Fecha o formulário de edição
+      onClose();
+    } catch (error) {
+      // Remove toast de loading
+      removeToast(loadingToastId);
+
+      // Mostra toast de erro
+      addToast({
+        type: "error",
+        title: "Erro ao salvar",
+        description: "Não foi possível atualizar o invoice. Tente novamente.",
+      });
+    }
   }
 
   useEffect(() => {
@@ -151,10 +223,10 @@ export const CardEditInvoice: React.FC<{
             <Button
               className="p-0 m-0 text-white cursor-pointer self-end"
               variant="outline"
-              disabled={item.isLoading}
+              disabled={item.isLoading || updateMovement.isPending}
               onClick={() => handleUpdateMovement({ id: item.id, data })}
             >
-              <Save />
+              {updateMovement.isPending ? <Spinner /> : <Save />}
             </Button>
           </Field>
         </div>

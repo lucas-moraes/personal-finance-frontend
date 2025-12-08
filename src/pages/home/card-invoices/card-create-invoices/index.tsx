@@ -9,6 +9,8 @@ import { formatBRLInput, parseBRLInput } from "@/lib/utils";
 import { useCreateMovement } from "@/tanstack-queries/movements";
 import { Save } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@/components/ui/toast";
+import { Spinner } from "@/components/ui/spinner";
 
 type TData = {
   date: Date | undefined;
@@ -30,9 +32,48 @@ export const CardCreateInvoices: React.FC<{ listCategories: Array<{ value: strin
   listCategories,
 }) => {
   const [data, setData] = useState<TData>(initialData);
+  const [isOpen, setIsOpen] = useState(false);
   const createMovement = useCreateMovement();
+  const { addToast, removeToast } = useToast();
 
   async function handleCreateMovement({ data }: { data: TData }) {
+    // Validação básica
+    if (!data.date) {
+      addToast({
+        type: "error",
+        title: "Erro ao salvar",
+        description: "Por favor, selecione uma data.",
+      });
+      return;
+    }
+
+    if (data.category === "empty" || !data.category) {
+      addToast({
+        type: "error",
+        title: "Erro ao salvar",
+        description: "Por favor, selecione uma categoria.",
+      });
+      return;
+    }
+
+    if (!data.kind) {
+      addToast({
+        type: "error",
+        title: "Erro ao salvar",
+        description: "Por favor, selecione o tipo (Entrada/Saída).",
+      });
+      return;
+    }
+
+    if (!data.amount || parseFloat(parseBRLInput(data.amount).toString()) <= 0) {
+      addToast({
+        type: "error",
+        title: "Erro ao salvar",
+        description: "Por favor, informe um valor válido.",
+      });
+      return;
+    }
+
     const dia = data.date?.getDate();
     const mes = data.date?.getMonth()! + 1;
     const ano = data.date?.getFullYear();
@@ -48,11 +89,43 @@ export const CardCreateInvoices: React.FC<{ listCategories: Array<{ value: strin
       valor: data.kind === "saida" ? amountCleaned * -1 : amountCleaned,
     };
 
-    await createMovement.mutateAsync({ data: formData });
-    if (createMovement.isSuccess) setData(initialData);
+    // Mostra toast de loading
+    const loadingToastId = addToast({
+      type: "loading",
+      title: "Salvando...",
+      description: "Aguarde enquanto salvamos os dados.",
+    });
+
+    try {
+      await createMovement.mutateAsync({ data: formData });
+      
+      // Remove toast de loading
+      removeToast(loadingToastId);
+      
+      // Mostra toast de sucesso
+      addToast({
+        type: "success",
+        title: "Sucesso!",
+        description: "Invoice criado com sucesso.",
+      });
+
+      // Limpa o formulário e fecha o sheet
+      setData(initialData);
+      setIsOpen(false);
+    } catch (error) {
+      // Remove toast de loading
+      removeToast(loadingToastId);
+      
+      // Mostra toast de erro
+      addToast({
+        type: "error",
+        title: "Erro ao salvar",
+        description: "Não foi possível salvar o invoice. Tente novamente.",
+      });
+    }
   }
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button variant="outline">Create invoice</Button>
       </SheetTrigger>
@@ -130,8 +203,9 @@ export const CardCreateInvoices: React.FC<{ listCategories: Array<{ value: strin
                     className="p-0 m-0 text-white cursor-pointer self-end"
                     variant="outline"
                     onClick={() => handleCreateMovement({ data })}
+                    disabled={createMovement.isPending}
                   >
-                    <Save />
+                    {createMovement.isPending ? <Spinner /> : <Save />}
                   </Button>
                 </Field>
               </div>
