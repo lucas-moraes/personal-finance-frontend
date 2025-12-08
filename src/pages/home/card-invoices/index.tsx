@@ -12,7 +12,7 @@ import {
   type TMovementById,
 } from "@/tanstack-queries/movements";
 import { useQueryYears } from "@/tanstack-queries/years";
-import { Check, CircleAlert, EllipsisVertical, X } from "lucide-react";
+import { Check, CircleAlert, EllipsisVertical, X, Inbox } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { CardEditInvoice } from "./card-edit-invoices";
 import { Badge } from "@/components/ui/badge";
@@ -129,20 +129,22 @@ export const CardInvoicesList = () => {
         {isLoading ? (
           <TableSkeleton columns={6} rows={8} />
         ) : (
-          <Table>
-            <TableHeader className="w-full text-white">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="w-[50px] text-white"></TableHead>
-                <TableHead className="w-[50px] text-white">Date</TableHead>
-                <TableHead className="text-white">Category</TableHead>
-                <TableHead className="text-white">Kind</TableHead>
-                <TableHead className="text-white">Description</TableHead>
-                <TableHead className="text-right text-white">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data?.movements.map((invoice) => {
-                if ("total" in invoice) return null;
+          <>
+            {data?.movements && data.movements.filter((invoice) => !("total" in invoice)).length > 0 ? (
+              <Table>
+                <TableHeader className="w-full text-white">
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="w-[50px] text-white"></TableHead>
+                    <TableHead className="w-[50px] text-white">Date</TableHead>
+                    <TableHead className="text-white">Category</TableHead>
+                    <TableHead className="text-white">Kind</TableHead>
+                    <TableHead className="text-white">Description</TableHead>
+                    <TableHead className="text-right text-white">Amount</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data?.movements.map((invoice) => {
+                    if ("total" in invoice) return null;
 
                 return (
                   <>
@@ -256,11 +258,21 @@ export const CardInvoicesList = () => {
                   </>
                 );
               })}
-            </TableBody>
-          </Table>
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+                <Inbox className="size-12 text-muted-foreground mb-4 opacity-50" />
+                <p className="text-lg font-medium text-muted-foreground mb-2">Nenhum movimento encontrado</p>
+                <p className="text-sm text-muted-foreground opacity-70">
+                  Não há invoices para exibir com os filtros selecionados.
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
-      {!isLoading && (
+      {!isLoading && data?.movements && data.movements.filter((invoice) => !("total" in invoice)).length > 0 && (
         <div className="max-h-[500px]">
           <Table>
             <TableFooter>
