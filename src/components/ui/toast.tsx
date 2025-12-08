@@ -22,8 +22,15 @@ const ToastContext = React.createContext<ToastContextType | undefined>(undefined
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = React.useState<Toast[]>([]);
+  const timeoutRefs = React.useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   const removeToast = React.useCallback((id: string) => {
+    // Limpa o timeout se existir
+    const timeoutId = timeoutRefs.current.get(id);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      timeoutRefs.current.delete(id);
+    }
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
@@ -36,12 +43,24 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     // Auto remove toast after duration (default 3 seconds, except for loading)
     if (toast.type !== "loading") {
       const duration = toast.duration ?? 3000;
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
+        timeoutRefs.current.delete(id);
         setToasts((prev) => prev.filter((t) => t.id !== id));
       }, duration);
+      timeoutRefs.current.set(id, timeoutId);
     }
 
     return id;
+  }, []);
+
+  // Cleanup: limpa todos os timeouts quando o componente for desmontado
+  React.useEffect(() => {
+    return () => {
+      timeoutRefs.current.forEach((timeoutId) => {
+        clearTimeout(timeoutId);
+      });
+      timeoutRefs.current.clear();
+    };
   }, []);
 
   return (
@@ -72,15 +91,37 @@ function ToastContainer({ toasts, removeToast }: { toasts: Toast[]; removeToast:
 
 function ToastItem({ toast, removeToast }: { toast: Toast; removeToast: (id: string) => void }) {
   const [isVisible, setIsVisible] = React.useState(false);
+  const removeTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   React.useEffect(() => {
     // Trigger animation
-    setTimeout(() => setIsVisible(true), 10);
+    const timeoutId = setTimeout(() => setIsVisible(true), 10);
+    
+    // Cleanup: limpa o timeout se o componente for desmontado
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  // Cleanup: limpa o timeout de remoção quando o componente for desmontado
+  React.useEffect(() => {
+    return () => {
+      if (removeTimeoutRef.current) {
+        clearTimeout(removeTimeoutRef.current);
+      }
+    };
   }, []);
 
   const handleRemove = () => {
     setIsVisible(false);
-    setTimeout(() => removeToast(toast.id), 200);
+    // Limpa qualquer timeout anterior antes de criar um novo
+    if (removeTimeoutRef.current) {
+      clearTimeout(removeTimeoutRef.current);
+    }
+    removeTimeoutRef.current = setTimeout(() => {
+      removeTimeoutRef.current = null;
+      removeToast(toast.id);
+    }, 200);
   };
 
   const icons = {
