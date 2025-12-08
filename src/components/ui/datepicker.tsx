@@ -9,6 +9,13 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Spinner } from "./spinner";
 
+function formatDateBR(date: Date): string {
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+}
+
 export function Datepicker({
   selected,
   isLoading = false,
@@ -41,7 +48,7 @@ export function Datepicker({
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" id="date" className="w-full justify-between font-normal cursor-pointer">
-              {date ? date.toLocaleDateString() : "Select date"}
+              {date ? formatDateBR(date) : "Select date"}
               <ChevronDownIcon />
             </Button>
           </PopoverTrigger>
