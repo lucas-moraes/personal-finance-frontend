@@ -50,6 +50,7 @@ export function Datepicker({
               mode="single"
               selected={date}
               captionLayout="dropdown"
+              endMonth={new Date(new Date().getFullYear() + 1, 11)} // Dezembro do próximo ano
               onSelect={(date) => {
                 setDate(date);
                 setOpen(false);
