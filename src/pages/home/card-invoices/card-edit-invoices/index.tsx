@@ -165,7 +165,7 @@ export const CardEditInvoice: React.FC<{
               onSelect={(date: Date | undefined) => {
                 setData((prev) => ({ ...prev, date: date }));
               }}
-              isLoading={item.isLoading}
+              isLoading={item.isLoading || updateMovement.isPending}
             />
           </Field>
           <Field>
@@ -178,7 +178,7 @@ export const CardEditInvoice: React.FC<{
               onSelect={(value: string) => {
                 setData((prev) => ({ ...prev, category: Number(value) }));
               }}
-              isLoading={isLoadingCategories || item.isLoading}
+              isLoading={isLoadingCategories || item.isLoading || updateMovement.isPending}
             />
           </Field>
           <Field>
@@ -194,7 +194,7 @@ export const CardEditInvoice: React.FC<{
               onSelect={(value: string | undefined) => {
                 setData((prev) => ({ ...prev, kind: value || "" }));
               }}
-              isLoading={item.isLoading}
+              isLoading={item.isLoading || updateMovement.isPending}
             />
           </Field>
         </div>
@@ -205,7 +205,7 @@ export const CardEditInvoice: React.FC<{
               currency="R$"
               placeholder="0,00"
               value={data.amount}
-              isLoading={item.isLoading}
+              isLoading={item.isLoading || updateMovement.isPending}
               onChange={(e) => setData((prev) => ({ ...prev, amount: formatBRLInput(e.value) }))}
             />
           </Field>
@@ -215,7 +215,7 @@ export const CardEditInvoice: React.FC<{
               id="description"
               autoComplete="off"
               value={data.description}
-              isLoading={item.isLoading}
+              isLoading={item.isLoading || updateMovement.isPending}
               onChange={(e) => setData((prev) => ({ ...prev, description: e.target.value || "" }))}
             />
           </Field>

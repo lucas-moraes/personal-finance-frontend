@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Datepicker } from "@/components/ui/datepicker";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupText } from "@/components/ui/input-group";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { formatBRLInput, parseBRLInput } from "@/lib/utils";
 import { useCreateMovement } from "@/tanstack-queries/movements";
@@ -11,6 +10,7 @@ import { Save } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/components/ui/toast";
 import { Spinner } from "@/components/ui/spinner";
+import { InputCurrency } from "@/components/team/home/input-currency";
 
 type TData = {
   date: Date | undefined;
@@ -141,6 +141,7 @@ export const CardCreateInvoices: React.FC<{ listCategories: Array<{ value: strin
                     onSelect={(date: Date | undefined) => {
                       setData((prev) => ({ ...prev, date }));
                     }}
+                    isLoading={createMovement.isPending}
                   />
                 </Field>
                 <Field>
@@ -153,6 +154,7 @@ export const CardCreateInvoices: React.FC<{ listCategories: Array<{ value: strin
                     onSelect={(value: string) => {
                       setData((prev) => ({ ...prev, category: value }));
                     }}
+                    isLoading={createMovement.isPending}
                   />
                 </Field>
                 <Field>
@@ -168,24 +170,18 @@ export const CardCreateInvoices: React.FC<{ listCategories: Array<{ value: strin
                     onSelect={(value: string | undefined) => {
                       setData((prev) => ({ ...prev, kind: value || "" }));
                     }}
+                    isLoading={createMovement.isPending}
                   />
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="value">Amount</FieldLabel>
-                  <InputGroup>
-                    <InputGroupAddon>
-                      <InputGroupText>R$</InputGroupText>
-                    </InputGroupAddon>
-                    <InputGroupInput
-                      className="pb-1"
-                      placeholder="0,00"
-                      value={data.amount}
-                      onChange={(e) => {
-                        const formatted = formatBRLInput(e.target.value);
-                        setData((prev) => ({ ...prev, amount: formatted }));
-                      }}
-                    />
-                  </InputGroup>
+                  <InputCurrency
+                    currency="R$"
+                    placeholder="0,00"
+                    value={data.amount}
+                    isLoading={createMovement.isPending}
+                    onChange={(e) => setData((prev) => ({ ...prev, amount: formatBRLInput(e.value) }))}
+                  />
                 </Field>
               </div>
               <div className="grid grid-cols-[11fr_1fr] gap-4">
@@ -195,6 +191,7 @@ export const CardCreateInvoices: React.FC<{ listCategories: Array<{ value: strin
                     id="description"
                     autoComplete="off"
                     value={data.description as string}
+                    isLoading={createMovement.isPending}
                     onChange={(e) => setData((prev) => ({ ...prev, description: e.target.value || "" }))}
                   />
                 </Field>

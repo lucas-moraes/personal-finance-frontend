@@ -18,6 +18,7 @@ import { CardEditInvoice } from "./card-edit-invoices";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { CardCreateInvoices } from "./card-create-invoices";
+import { Spinner } from "@/components/ui/spinner";
 
 export const CardInvoicesList = () => {
   const [editItem, setEditItem] = useState<number | null>(null);
@@ -49,7 +50,14 @@ export const CardInvoicesList = () => {
   }
 
   function DeleteMovement({ id }: { id: string }) {
-    deleteMovement.mutate({ id });
+    deleteMovement.mutate(
+      { id },
+      {
+        onSuccess: () => {
+          setDeleteItem(null);
+        },
+      }
+    );
   }
 
   function CheckFilters({ origin, value }: { origin: "category" | "month" | "year"; value: string }) {
@@ -216,19 +224,21 @@ export const CardInvoicesList = () => {
                             <div className="flex flex-row gap-4">
                               <Button
                                 size="icon"
-                                className="w-[50px] bg-transparent cursor-pointer text-white border border-red-500 hover:bg-red-600 hover:border-red-600"
+                                className="w-[50px] bg-transparent cursor-pointer text-white border border-red-500 hover:bg-red-600 hover:border-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={() => {
                                   DeleteMovement({ id: invoice.id });
-                                  setDeleteItem(null);
                                 }}
+                                disabled={deleteMovement.isPending}
                               >
-                                <Check />
+                                {deleteMovement.isPending ? <Spinner className="size-4" /> : <Check />}
                               </Button>
                               <Button
-                                className="w-[50px] bg-transparent cursor-pointer text-white border border-green-400 hover:text-green-800 hover:bg-green-400 hover:border-green-400"
+                                size="icon"
+                                className="w-[50px] bg-transparent cursor-pointer text-white border border-green-400 hover:text-green-800 hover:bg-green-400 hover:border-green-400 disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={() => {
                                   setDeleteItem(null);
                                 }}
+                                disabled={deleteMovement.isPending}
                               >
                                 <X />
                               </Button>
