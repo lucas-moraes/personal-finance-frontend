@@ -36,6 +36,7 @@ export const useApi = () => {
     return res;
   }
 
+
   const useLogin = async ({ email, password }: { email: string; password: string }) => {
     const resp = await ApiFetch({
       endpoint: "/api/auth/login",
@@ -233,6 +234,36 @@ export const useApi = () => {
     }).then((res) => res);
   }
 
+  
+  const useUpinsertSavings = async ({value}:{value: number}) => {
+    if (!token) {
+      return navigate({ to: "/login" });
+    }
+
+    return await ApiFetch({
+      endpoint: `/api/savings/upinsert`,
+      options: {
+        method: "PATCH",
+        body: JSON.stringify({value}),
+      },
+      token,
+    }).then((res) => res);
+  }
+
+  const useClearSavings = async () => {
+    if (!token) {
+      return navigate({ to: "/login" });
+    }
+
+    return await ApiFetch({
+      endpoint: `/api/savings/clear`,
+      options: {
+        method: "PATCH",
+      },
+      token,
+    }).then((res) => res);
+  }
+
   return {
     useLogin,
     useToken,
@@ -247,5 +278,7 @@ export const useApi = () => {
     useDeleteMovement,
     useCreateCategory,
     useCreateMovement,
+    useUpinsertSavings,
+    useClearSavings,
   };
 };

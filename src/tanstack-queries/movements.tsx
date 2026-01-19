@@ -12,6 +12,7 @@ export type TInvoice = {
     tipo: string;
     valor: number;
   }>;
+  savings: number;
   total: number;
 };
 

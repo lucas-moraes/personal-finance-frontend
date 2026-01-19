@@ -2,7 +2,7 @@ import { TableRowButtonOptions } from "@/components/team/home/table-row-button-o
 import { InputSelect } from "@/components/team/input-select";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { FormatNumberToCurrency } from "@/lib/utils";
+import { formatBRLInput, FormatNumberToCurrency, parseBRLInput } from "@/lib/utils";
 import { useQueryCategories } from "@/tanstack-queries/categories";
 import { useQueryMonths } from "@/tanstack-queries/months";
 import {
@@ -12,13 +12,15 @@ import {
   type TMovementById,
 } from "@/tanstack-queries/movements";
 import { useQueryYears } from "@/tanstack-queries/years";
-import { Check, CircleAlert, EllipsisVertical, X, Inbox } from "lucide-react";
+import { Check, CircleAlert, EllipsisVertical, X, Inbox, Pencil, Save } from "lucide-react";
 import { useEffect, useId, useState } from "react";
 import { CardEditInvoice } from "./card-edit-invoices";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/ui/table-skeleton";
 import { CardCreateInvoices } from "./card-create-invoices";
 import { Spinner } from "@/components/ui/spinner";
+import { InputCurrency } from "@/components/team/home/input-currency";
+import { useUpinsertSavings } from "@/tanstack-queries/savings";
 
 export const CardInvoicesList = () => {
   const [editItem, setEditItem] = useState<number | null>(null);
@@ -30,6 +32,7 @@ export const CardInvoicesList = () => {
     year?: string;
     isChanged?: boolean;
   }>({});
+  const [savingsEdit, setSavingsEdit] = useState<{ willEdit: boolean; value: string }>({ willEdit: false, value: "" });
   const id = useId();
   const categories = useQueryCategories();
   const months = useQueryMonths();
@@ -41,6 +44,7 @@ export const CardInvoicesList = () => {
     category: filterData.category,
   });
   const { data: dataToEdit, isLoading: isLoadingEdit } = useQueryFilterMovementById({ id: editItem! });
+  const savingsUpsert = useUpinsertSavings();
 
   function InitialMovement() {
     const today = new Date();
@@ -56,7 +60,7 @@ export const CardInvoicesList = () => {
         onSuccess: () => {
           setDeleteItem(null);
         },
-      }
+      },
     );
   }
 
@@ -76,6 +80,12 @@ export const CardInvoicesList = () => {
     }
   }
 
+  async function SaveSavings() {
+    const value = parseBRLInput(String(savingsEdit.value));
+    await savingsUpsert.mutateAsync({ value });
+    setSavingsEdit((prev) => ({ ...prev, willEdit: false }));
+  }
+
   useEffect(() => {
     const itemToEdit = document.getElementById(`invoice-row-${showLineOptions}`);
     itemToEdit?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -84,6 +94,8 @@ export const CardInvoicesList = () => {
   useEffect(() => {
     InitialMovement();
   }, []);
+
+  console.log(`=>`, savingsEdit.value)
 
   return (
     <>
@@ -154,120 +166,121 @@ export const CardInvoicesList = () => {
                   {data?.movements.map((invoice) => {
                     if ("total" in invoice) return null;
 
-                return (
-                  <>
-                    <TableRow
-                      key={id}
-                      id={`invoice-row-${invoice.id}`}
-                      className={
-                        "hover:bg-violet-600/20 border-b border-white/10" +
-                        (Number(invoice.valor) < 0 ? " text-pink-400" : " text-indigo-400") +
-                        (editItem === Number(invoice.id) && "dark: bg-green-900/30 hover:bg-green-900/30 opacity-50") +
-                        (deleteItem === Number(invoice.id) && "dark: bg-red-600/30 hover:bg-red-600/30 opacity-50")
-                      }
-                    >
-                      <TableCell className="w-[50px] font-medium gap-2">
-                        {showLineOptions !== Number(invoice.id) && (
-                          <Button
-                            variant="ghost"
-                            className="p-0 m-0 text-white cursor-pointer hover:bg-white/10"
-                            onClick={() => setShowLineOptions(Number(invoice.id))}
-                          >
-                            <EllipsisVertical size={16} />
-                          </Button>
-                        )}
-                        {showLineOptions === Number(invoice.id) && (
-                          <TableRowButtonOptions
-                            disabled={editItem !== null || deleteItem !== null}
-                            onClose={() => {
-                              setShowLineOptions(null);
-                              setEditItem(null);
-                            }}
-                            onEditItem={() => {
-                              setEditItem(Number(invoice.id));
-                            }}
-                            onDeleteItem={() => {
-                              //DeleteMovement({ id: invoice.id });
-                              setDeleteItem(Number(invoice.id));
-                            }}
-                          />
-                        )}
-                      </TableCell>
-                      <TableCell className="w-[50px] font-medium">
-                        {`
+                    return (
+                      <>
+                        <TableRow
+                          key={id}
+                          id={`invoice-row-${invoice.id}`}
+                          className={
+                            "hover:bg-violet-600/20 border-b border-white/10" +
+                            (Number(invoice.valor) < 0 ? " text-pink-400" : " text-indigo-400") +
+                            (editItem === Number(invoice.id) &&
+                              "dark: bg-green-900/30 hover:bg-green-900/30 opacity-50") +
+                            (deleteItem === Number(invoice.id) && "dark: bg-red-600/30 hover:bg-red-600/30 opacity-50")
+                          }
+                        >
+                          <TableCell className="w-[50px] font-medium gap-2">
+                            {showLineOptions !== Number(invoice.id) && (
+                              <Button
+                                variant="ghost"
+                                className="p-0 m-0 text-white cursor-pointer hover:bg-white/10"
+                                onClick={() => setShowLineOptions(Number(invoice.id))}
+                              >
+                                <EllipsisVertical size={16} />
+                              </Button>
+                            )}
+                            {showLineOptions === Number(invoice.id) && (
+                              <TableRowButtonOptions
+                                disabled={editItem !== null || deleteItem !== null}
+                                onClose={() => {
+                                  setShowLineOptions(null);
+                                  setEditItem(null);
+                                }}
+                                onEditItem={() => {
+                                  setEditItem(Number(invoice.id));
+                                }}
+                                onDeleteItem={() => {
+                                  //DeleteMovement({ id: invoice.id });
+                                  setDeleteItem(Number(invoice.id));
+                                }}
+                              />
+                            )}
+                          </TableCell>
+                          <TableCell className="w-[50px] font-medium">
+                            {`
                        ${invoice.dia}/${invoice.mes}/${invoice.ano}
                       `}
-                      </TableCell>
-                      <TableCell>{invoice.categoriaDescricao}</TableCell>
-                      <TableCell className="capitalize">
-                        {invoice.tipo === "entrada" ? (
-                          <Badge variant="secondary" className="bg-blue-500 text-white dark:bg-blue-600">
-                            {invoice.tipo}
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary" className="bg-pink-500 text-white dark:bg-pink-600">
-                            {invoice.tipo}
-                          </Badge>
+                          </TableCell>
+                          <TableCell>{invoice.categoriaDescricao}</TableCell>
+                          <TableCell className="capitalize">
+                            {invoice.tipo === "entrada" ? (
+                              <Badge variant="secondary" className="bg-blue-500 text-white dark:bg-blue-600">
+                                {invoice.tipo}
+                              </Badge>
+                            ) : (
+                              <Badge variant="secondary" className="bg-pink-500 text-white dark:bg-pink-600">
+                                {invoice.tipo}
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="whitespace-normal">{invoice.descricao}</TableCell>
+                          <TableCell className="text-right">
+                            {FormatNumberToCurrency(Number(invoice.valor < 0 ? invoice.valor * -1 : invoice.valor))}
+                          </TableCell>
+                        </TableRow>
+                        {deleteItem === Number(invoice.id) && (
+                          <TableRow className="bg-red-600/20 hover:bg-red-600/20 border-b border-white/20 ">
+                            <TableCell colSpan={6} className="p-4">
+                              <div className="flex flex-row items-center justify-center gap-4">
+                                <CircleAlert />
+                                <p>Are you sure you want to delete this movement?</p>
+                                <div className="flex flex-row gap-4">
+                                  <Button
+                                    size="icon"
+                                    className="w-[50px] bg-transparent cursor-pointer text-white border border-red-500 hover:bg-red-600 hover:border-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    onClick={() => {
+                                      DeleteMovement({ id: invoice.id });
+                                    }}
+                                    disabled={deleteMovement.isPending}
+                                  >
+                                    {deleteMovement.isPending ? <Spinner className="size-4" /> : <Check />}
+                                  </Button>
+                                  <Button
+                                    size="icon"
+                                    className="w-[50px] bg-transparent cursor-pointer text-white border border-green-400 hover:text-green-800 hover:bg-green-400 hover:border-green-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    onClick={() => {
+                                      setDeleteItem(null);
+                                    }}
+                                    disabled={deleteMovement.isPending}
+                                  >
+                                    <X />
+                                  </Button>
+                                </div>
+                              </div>
+                            </TableCell>
+                          </TableRow>
                         )}
-                      </TableCell>
-                      <TableCell className="whitespace-normal">{invoice.descricao}</TableCell>
-                      <TableCell className="text-right">
-                        {FormatNumberToCurrency(Number(invoice.valor < 0 ? invoice.valor * -1 : invoice.valor))}
-                      </TableCell>
-                    </TableRow>
-                    {deleteItem === Number(invoice.id) && (
-                      <TableRow className="bg-red-600/20 hover:bg-red-600/20 border-b border-white/20 ">
-                        <TableCell colSpan={6} className="p-4">
-                          <div className="flex flex-row items-center justify-center gap-4">
-                            <CircleAlert />
-                            <p>Are you sure you want to delete this movement?</p>
-                            <div className="flex flex-row gap-4">
-                              <Button
-                                size="icon"
-                                className="w-[50px] bg-transparent cursor-pointer text-white border border-red-500 hover:bg-red-600 hover:border-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                                onClick={() => {
-                                  DeleteMovement({ id: invoice.id });
+                        {editItem === Number(invoice.id) && (
+                          <TableRow className="bg-green-600/10 hover:bg-gree-600/10 border-b border-white/20 ">
+                            <TableCell colSpan={6} className="p-4">
+                              <CardEditInvoice
+                                item={{
+                                  id: editItem.toString(),
+                                  data: (dataToEdit ?? []) as TMovementById[],
+                                  isLoading: isLoadingEdit,
                                 }}
-                                disabled={deleteMovement.isPending}
-                              >
-                                {deleteMovement.isPending ? <Spinner className="size-4" /> : <Check />}
-                              </Button>
-                              <Button
-                                size="icon"
-                                className="w-[50px] bg-transparent cursor-pointer text-white border border-green-400 hover:text-green-800 hover:bg-green-400 hover:border-green-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                                onClick={() => {
-                                  setDeleteItem(null);
+                                listCategories={categories.data!}
+                                isLoadingCategories={categories.isLoading}
+                                onClose={() => {
+                                  setEditItem(null);
                                 }}
-                                disabled={deleteMovement.isPending}
-                              >
-                                <X />
-                              </Button>
-                            </div>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                    {editItem === Number(invoice.id) && (
-                      <TableRow className="bg-green-600/10 hover:bg-gree-600/10 border-b border-white/20 ">
-                        <TableCell colSpan={6} className="p-4">
-                          <CardEditInvoice
-                            item={{
-                              id: editItem.toString(),
-                              data: (dataToEdit ?? []) as TMovementById[],
-                              isLoading: isLoadingEdit,
-                            }}
-                            listCategories={categories.data!}
-                            isLoadingCategories={categories.isLoading}
-                            onClose={() => {
-                              setEditItem(null);
-                            }}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </>
-                );
-              })}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </>
+                    );
+                  })}
                 </TableBody>
               </Table>
             ) : (
@@ -286,9 +299,9 @@ export const CardInvoicesList = () => {
         <div className="max-h-[500px]">
           <Table>
             <TableFooter>
-              <TableRow className={Number(data?.total) < 0 ? " text-pink-400" : " text-indigo-400"}>
-                <TableCell colSpan={5}>Total</TableCell>
-                <TableCell className={"text-right" + (Number(data?.total) < 0 ? " text-pink-400" : " text-indigo-400")}>
+              <TableRow className={Number(data?.total) < 0 ? " text-pink-700" : " text-slate-700"}>
+                <TableCell colSpan={5}>Subtotal</TableCell>
+                <TableCell className={"text-right" + (Number(data?.total) < 0 ? " text-pink-700" : " text-slate-700")}>
                   {FormatNumberToCurrency(Number(data?.total))}
                 </TableCell>
               </TableRow>
@@ -296,6 +309,97 @@ export const CardInvoicesList = () => {
           </Table>
         </div>
       )}
+      {!isLoading && data?.movements && data.movements.filter((invoice) => !("savings" in invoice)).length > 0 && (
+        <div className="max-h-[500px]">
+          <Table>
+            <TableFooter>
+              <TableRow
+                className={
+                  "flex flex-row items-center justify-between w-full" +
+                  (Number(data?.savings) < 0 ? " text-pink-400" : " text-lime-400")
+                }
+              >
+                <TableCell className={"w-[50px] flex items-center gap-2"}>
+                  Savings
+                  <Button
+                    variant="ghost"
+                    className="p-0 m-0 text-amber-500 cursor-pointer hover:bg-amber-500/10"
+                    disabled={savingsEdit.willEdit}
+                    onClick={() => {
+                      setSavingsEdit({willEdit: true, value: formatBRLInput(String(data?.savings.toFixed(2)))});
+                    }}
+                  >
+                    <Pencil size={16} />
+                  </Button>
+                </TableCell>
+                <TableCell
+                  id="test"
+                  className={
+                    "flex h-full justify-end text-right" +
+                    (Number(data?.savings) < 0 ? " text-pink-400" : " text-lime-400")
+                  }
+                >
+                  {!savingsEdit.willEdit ? (
+                    <>{FormatNumberToCurrency(Number(data?.savings))}</>
+                  ) : (
+                    <div className="w-[220px] flex flex-row items-end gap-2 justify-end">
+                      <Button
+                        variant="ghost"
+                        className="p-0 m-0 text-red-500 cursor-pointer hover:bg-amber-500/10"
+                        disabled={!savingsEdit.willEdit}
+                        onClick={() => {
+                          setSavingsEdit({ willEdit: false, value: formatBRLInput(String(data?.savings)) });
+                        }}
+                      >
+                        <X size={16} />
+                      </Button>
+                      <InputCurrency
+                        currency="R$"
+                        placeholder="0,00"
+                        value={savingsEdit.value}
+                        onChange={(e) => {
+                          setSavingsEdit((prev) => ({ ...prev, value: formatBRLInput(e.value) }));
+                        }}
+                      />
+                      <Button
+                        variant="ghost"
+                        className="p-0 m-0 text-green-500 cursor-pointer"
+                        disabled={!savingsEdit.willEdit}
+                        onClick={() => {
+                          SaveSavings();
+                        }}
+                      >
+                        <Save size={16} />
+                      </Button>
+                    </div>
+                  )}
+                </TableCell>
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </div>
+      )}
+      {!isLoading &&
+        data?.movements &&
+        data.movements.filter((invoice) => !("total" in invoice)).length > 0 &&
+        data.movements.filter((invoice) => !("savings" in invoice)).length > 0 && (
+          <div className="max-h-[500px]">
+            <Table>
+              <TableFooter>
+                <TableRow className={Number(data?.total + data?.savings) < 0 ? " text-pink-400" : " text-indigo-400"}>
+                  <TableCell colSpan={5}>General total</TableCell>
+                  <TableCell
+                    className={
+                      "text-right" + (Number(data?.total + data?.savings) < 0 ? " text-pink-400" : " text-indigo-400")
+                    }
+                  >
+                    {FormatNumberToCurrency(Number(data?.total + data?.savings))}
+                  </TableCell>
+                </TableRow>
+              </TableFooter>
+            </Table>
+          </div>
+        )}
     </>
   );
 };
